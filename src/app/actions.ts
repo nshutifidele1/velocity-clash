@@ -5,7 +5,6 @@ import { assignPerformanceTitles } from "@/ai/flows/assign-performance-titles";
 import { db } from "@/lib/firebase";
 import { doc, runTransaction, serverTimestamp, collection } from "firebase/firestore";
 import { redirect } from "next/navigation";
-import type { MatchResult } from "@/lib/types";
 import { formSchema } from "@/lib/schemas";
 
 export async function submitMatchResults(values: z.infer<typeof formSchema>) {
@@ -26,8 +25,10 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
     };
 
     const aiResult = await assignPerformanceTitles(aiInput);
+    
+    const matchRef = doc(collection(db, "matches"));
 
-    const matchData: MatchResult = {
+    const matchData = {
       player1: {
         ...validatedData.player1,
         lapTime: Number(validatedData.player1.lapTime) || 0,
@@ -39,7 +40,7 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
         title: aiResult.player2Title,
       },
       commentary: aiResult.commentary,
-      timestamp: new Date(),
+      timestamp: serverTimestamp(),
     };
 
     await runTransaction(db, async (transaction) => {
@@ -63,12 +64,10 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
         transaction.update(player2Ref, { totalPoints: newPoints, matchesPlayed: newMatches });
       }
 
-      const matchRef = doc(collection(db, "matches"));
-      transaction.set(matchRef, { ...matchData, timestamp: serverTimestamp() });
+      transaction.set(matchRef, matchData);
     });
 
-    const resultsQuery = encodeURIComponent(JSON.stringify(matchData));
-    redirect(`/results?data=${resultsQuery}`);
+    redirect(`/results?id=${matchRef.id}`);
 
   } catch (error) {
     console.error("Error submitting match results:", error);

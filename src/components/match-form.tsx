@@ -149,7 +149,7 @@ export function MatchForm() {
           disabled={isPending}
           className="w-full font-headline text-lg py-6 bg-accent text-accent-foreground hover:bg-accent/90 rounded-md box-glow-accent transition-all"
         >
-          {isPending ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : "Add Win"}
+          {isPending ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : "Submit Results"}
         </Button>
       </form>
     </Form>

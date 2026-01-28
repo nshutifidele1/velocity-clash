@@ -25,7 +25,7 @@ export async function Leaderboard() {
       <CardHeader>
         <CardTitle className="font-headline text-2xl flex items-center gap-2 text-primary text-glow-primary">
           <Trophy />
-          Leaderboard
+          Weekly Leaderboard
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -50,10 +50,7 @@ export async function Leaderboard() {
                   </span>
                   <span className="font-headline text-lg font-semibold">{player.id}</span>
                   {index === 0 && (
-                    <div className="relative">
-                      <Crown className="h-5 w-5 text-yellow-400" style={{filter: 'drop-shadow(0 0 3px #facc15)'}} />
-                      <span className="absolute -top-4 -right-12 text-xs font-headline text-yellow-400 text-glow-primary rotate-12">Player of the Week</span>
-                    </div>
+                    <Crown className="h-5 w-5 text-yellow-400" style={{filter: 'drop-shadow(0 0 3px #facc15)'}} />
                   )}
                 </div>
                 <div className="font-mono text-xl font-bold text-accent text-glow-accent">

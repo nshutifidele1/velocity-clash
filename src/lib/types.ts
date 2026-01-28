@@ -11,6 +11,7 @@ export interface PlayerResult extends PlayerStats {
 }
 
 export interface MatchResult {
+  id: string;
   player1: PlayerResult;
   player2: PlayerResult;
   commentary: string;
