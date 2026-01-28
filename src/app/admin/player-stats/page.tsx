@@ -44,6 +44,8 @@ async function getPlayerStats(): Promise<PlayerStatsSummary[]> {
                 totalPoints: 0,
                 winRate: 0,
                 avgPoints: 0,
+                totalPowerUpHits: 0,
+                avgPowerUpHits: 0,
             };
         }
     });
@@ -57,10 +59,12 @@ async function getPlayerStats(): Promise<PlayerStatsSummary[]> {
         if (p1Stats) {
             p1Stats.gamesPlayed += 1;
             p1Stats.totalPoints += player1.totalPoints;
+            p1Stats.totalPowerUpHits += player1.powerUpHits;
         }
         if (p2Stats) {
             p2Stats.gamesPlayed += 1;
             p2Stats.totalPoints += player2.totalPoints;
+            p2Stats.totalPowerUpHits += player2.powerUpHits;
         }
 
         if (player1.totalPoints > player2.totalPoints) {
@@ -76,6 +80,7 @@ async function getPlayerStats(): Promise<PlayerStatsSummary[]> {
         ...playerStat,
         winRate: playerStat.gamesPlayed > 0 ? (playerStat.wins / playerStat.gamesPlayed) * 100 : 0,
         avgPoints: playerStat.gamesPlayed > 0 ? playerStat.totalPoints / playerStat.gamesPlayed : 0,
+        avgPowerUpHits: playerStat.gamesPlayed > 0 ? playerStat.totalPowerUpHits / playerStat.gamesPlayed : 0,
     })).sort((a, b) => b.totalPoints - a.totalPoints);
 }
 
@@ -100,6 +105,8 @@ export default async function PlayerStatsPage() {
                             <TableHead className="text-right">Win Rate</TableHead>
                             <TableHead className="text-right">Total Points</TableHead>
                             <TableHead className="text-right">Avg. Points</TableHead>
+                            <TableHead className="text-right">Total Hits</TableHead>
+                            <TableHead className="text-right">Avg. Hits</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -120,6 +127,8 @@ export default async function PlayerStatsPage() {
                                 <TableCell className="text-right">{player.winRate.toFixed(0)}%</TableCell>
                                 <TableCell className="text-right font-mono font-bold">{player.totalPoints.toLocaleString()}</TableCell>
                                 <TableCell className="text-right font-mono">{player.avgPoints.toFixed(0)}</TableCell>
+                                <TableCell className="text-right font-mono">{player.totalPowerUpHits.toLocaleString()}</TableCell>
+                                <TableCell className="text-right font-mono">{player.avgPowerUpHits.toFixed(1)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

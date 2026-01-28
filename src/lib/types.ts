@@ -42,6 +42,8 @@ export interface PlayerStatsSummary {
   winRate: number;
   totalPoints: number;
   avgPoints: number;
+  totalPowerUpHits: number;
+  avgPowerUpHits: number;
 }
 
 export interface League {
