@@ -26,6 +26,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { GenerateMatchesButton } from "@/components/generate-matches-button";
 
 async function getMatches(): Promise<MatchResult[]> {
   try {
@@ -53,8 +54,13 @@ export default async function AdminMatchesPage() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Matches</CardTitle>
-                <CardDescription>Manage all submitted match results.</CardDescription>
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <CardTitle>Matches</CardTitle>
+                        <CardDescription>Manage all submitted match results.</CardDescription>
+                    </div>
+                    <GenerateMatchesButton />
+                </div>
             </CardHeader>
             <CardContent>
                 <Table>

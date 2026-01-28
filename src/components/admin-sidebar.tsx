@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Swords, Users, Settings } from "lucide-react";
+import { LayoutDashboard, Swords, Users, Settings, Trophy } from "lucide-react";
 
 const links = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/matches", label: "Matches", icon: Swords },
-    { href: "/admin/users", label: "Users", icon: Users },
+    { href: "/admin/users", label: "Players", icon: Users },
+    { href: "/admin/trophies", label: "Trophies", icon: Trophy },
 ];
 
 export function AdminSidebar() {

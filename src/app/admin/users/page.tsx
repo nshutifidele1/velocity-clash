@@ -48,13 +48,13 @@ const getInitials = (name: string) => {
     .join('');
 };
 
-export default async function AdminUsersPage() {
+export default async function AdminPlayersPage() {
     const users = await getUsers();
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Users</CardTitle>
+                <CardTitle>Players</CardTitle>
                 <CardDescription>Manage all registered players.</CardDescription>
             </CardHeader>
             <CardContent>
