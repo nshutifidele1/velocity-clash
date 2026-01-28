@@ -5,7 +5,7 @@ import { assignPerformanceTitles } from "@/ai/flows/assign-performance-titles";
 import { db } from "@/lib/firebase";
 import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc } from "firebase/firestore";
 import { redirect } from "next/navigation";
-import { formSchema, leagueSchema } from "@/lib/schemas";
+import { formSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 
 export async function submitMatchResults(values: z.infer<typeof formSchema>) {
@@ -85,27 +85,4 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
     }
     return { error: "An unexpected error occurred on the server." };
   }
-}
-
-
-export async function createLeague(values: z.infer<typeof leagueSchema>) {
-    try {
-        const validatedData = leagueSchema.parse(values);
-        const leagueRef = doc(collection(db, "leagues"));
-        
-        await setDoc(leagueRef, {
-            id: leagueRef.id,
-            name: validatedData.name,
-        });
-
-        revalidatePath("/admin/leagues");
-        return { success: true, id: leagueRef.id };
-
-    } catch (error) {
-        console.error("Error creating league:", error);
-        if (error instanceof z.ZodError) {
-            return { error: "Validation failed", details: error.flatten() };
-        }
-        return { error: "An unexpected error occurred." };
-    }
 }
