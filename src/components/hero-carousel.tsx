@@ -11,7 +11,7 @@ import {
 import Image from 'next/image';
 
 const images = [
-  "https://i.pinimg.com/736x/2c/73/bb/2c73bb0e35e0d176e113a62409b4a7b2.jpg",
+  "https://i.pinimg.com/736x/d4/9e/c5/d49ec5ce9ca9e6007bab4272c1fbd934.jpg",
   "https://i.pinimg.com/736x/7d/9b/86/7d9b86953aeac518e96317c9aeef9a21.jpg",
   "https://i.pinimg.com/736x/9e/2b/3f/9e2b3fe786fdc83d3bbe7d1718db33d7.jpg",
   "https://i.pinimg.com/736x/51/26/8d/51268def327b98a67bb5f174e2b28bab.jpg",

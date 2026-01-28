@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "creator-imanzi",
-      "description": "Portrait of Imanzi Lutfy",
-      "imageUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njk1MzA5ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "man portrait"
+      "description": "A drifting race car",
+      "imageUrl": "https://i.pinimg.com/736x/2c/73/bb/2c73bb0e35e0d176e113a62409b4a7b2.jpg",
+      "imageHint": "car racing"
     },
     {
       "id": "creator-fidele",
