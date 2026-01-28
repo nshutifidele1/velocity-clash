@@ -10,7 +10,7 @@ export default function Home() {
         <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
           <iframe
             className="absolute top-1/2 left-1/2 w-auto min-w-full min-h-full max-w-none -translate-x-1/2 -translate-y-1/2"
-            src="https://assets.pinterest.com/ext/embed.html?id=47358233578143592"
+            src="https://assets.pinterest.com/ext/embed.html?id=102175485293892273"
             frameBorder="0"
             scrolling="no"
             allow="autoplay"
