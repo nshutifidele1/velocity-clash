@@ -1,4 +1,4 @@
-import { MatchForm } from "@/components/match-form";
+import { AddResultView } from "@/components/add-result-view";
 
 export default function AddResultPage() {
   return (
@@ -13,7 +13,7 @@ export default function AddResultPage() {
       </div>
 
       <div className="max-w-4xl mx-auto">
-          <MatchForm />
+          <AddResultView />
       </div>
     </main>
   );
