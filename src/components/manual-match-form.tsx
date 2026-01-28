@@ -17,23 +17,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import { submitMatchResults } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { formSchema } from "@/lib/schemas";
 
-interface ManualMatchFormProps {
-    players: string[];
-}
-
-export function ManualMatchForm({ players }: ManualMatchFormProps) {
+export function ManualMatchForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
@@ -82,18 +71,9 @@ export function ManualMatchForm({ players }: ManualMatchFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Player Name</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                      <SelectTrigger>
-                          <SelectValue placeholder="Select a player" />
-                      </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                      {players.map(p => (
-                          <SelectItem key={p} value={p}>{p}</SelectItem>
-                      ))}
-                  </SelectContent>
-              </Select>
+              <FormControl>
+                <Input placeholder="Enter name" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
