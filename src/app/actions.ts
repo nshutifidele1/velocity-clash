@@ -91,15 +91,8 @@ export async function autoGenerateMatch() {
             return { error: "Not enough players to generate a match. At least 2 players are required." };
         }
 
-        // Select two different random players
-        let player1Index = Math.floor(Math.random() * players.length);
-        let player2Index = Math.floor(Math.random() * players.length);
-        while (player1Index === player2Index) {
-            player2Index = Math.floor(Math.random() * players.length);
-        }
-
-        const player1Name = players[player1Index];
-        const player2Name = players[player2Index];
+        const player1Name = players[0];
+        const player2Name = players[1];
 
         // Generate random stats
         const player1Points = Math.floor(Math.random() * 4501) + 500;
