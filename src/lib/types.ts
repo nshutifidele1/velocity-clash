@@ -33,6 +33,17 @@ export interface UserProfile {
   email: string;
 }
 
+export interface PlayerStatsSummary {
+  name: string;
+  photoUrl?: string;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  totalPoints: number;
+  avgPoints: number;
+}
+
 export interface League {
   id: string;
   name: string;

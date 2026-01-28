@@ -27,6 +27,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { getInitials } from "@/lib/utils";
 
 async function getUsers(): Promise<UserProfile[]> {
   try {
@@ -39,14 +40,6 @@ async function getUsers(): Promise<UserProfile[]> {
     return [];
   }
 }
-
-const getInitials = (name: string) => {
-    if (!name) return '';
-    return name
-    .split(' ')
-    .map(n => n[0])
-    .join('');
-};
 
 export default async function AdminPlayersPage() {
     const users = await getUsers();

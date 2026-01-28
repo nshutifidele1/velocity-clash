@@ -22,6 +22,7 @@ import {
   AvatarImage,
 } from '@/components/ui/avatar';
 import { Skeleton } from './ui/skeleton';
+import { getInitials } from '@/lib/utils';
 
 export function Header() {
     const { user, profile, loading } = useUser();
@@ -35,14 +36,6 @@ export function Header() {
     const handleLogout = async () => {
         await signOut(auth);
         router.push('/');
-    };
-
-    const getInitials = (name: string) => {
-        if (!name) return '';
-        return name
-        .split(' ')
-        .map(n => n[0])
-        .join('');
     };
 
     return (
