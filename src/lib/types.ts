@@ -31,3 +31,8 @@ export interface UserProfile {
   photoUrl?: string;
   email: string;
 }
+
+export interface League {
+  id: string;
+  name: string;
+}
