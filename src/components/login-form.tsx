@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,11 +22,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/schemas";
 import { auth } from "@/lib/firebase";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function LoginForm() {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { toast } = useToast();
+  const [secretCode, setSecretCode] = useState("");
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -58,6 +70,22 @@ export function LoginForm() {
       }
     });
   }
+
+  const handleAdminLogin = () => {
+    if (secretCode === "v-clash#admin@123") {
+        router.push("/admin");
+        toast({
+            title: "Admin Access Granted",
+            description: "Redirecting to the admin dashboard.",
+        });
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Access Denied",
+            description: "The secret code is incorrect.",
+        });
+    }
+  };
 
   return (
     <Card className="bg-card/50">
@@ -99,7 +127,31 @@ export function LoginForm() {
                 )}
                 />
                 
-                <div className="flex justify-end items-center pt-4">
+                <div className="flex justify-between items-center pt-4">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="link" type="button" className="text-muted-foreground hover:text-primary">Admin Gate</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Admin Access</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Enter the secret code to access the admin dashboard.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <Input 
+                                type="password"
+                                placeholder="Secret Code"
+                                value={secretCode}
+                                onChange={(e) => setSecretCode(e.target.value)}
+                            />
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleAdminLogin} className="bg-accent text-accent-foreground hover:bg-accent/90">Continue</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
                     <Button type="submit" disabled={isPending} className="bg-accent text-accent-foreground hover:bg-accent/90">
                         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Login
