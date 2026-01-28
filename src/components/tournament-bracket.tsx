@@ -8,9 +8,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Crown, Trophy } from 'lucide-react';
+import { Crown, Trophy, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { UserProfile, BracketRound, BracketMatchup } from '@/lib/types';
+import { Input } from '@/components/ui/input';
 
 const BRACKET_SIZES = [4, 8, 16, 32, 64];
 
@@ -73,6 +74,8 @@ export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
     const [selectedPlayers, setSelectedPlayers] = useState<UserProfile[]>([]);
     const [rounds, setRounds] = useState<BracketRound[]>([]);
     const [champion, setChampion] = useState<UserProfile | null>(null);
+    const [championDisplayName, setChampionDisplayName] = useState<string>('');
+    const [isEditingChampion, setIsEditingChampion] = useState<boolean>(false);
 
     const handlePlayerSelection = (player: UserProfile, isSelected: boolean) => {
         if (isSelected) {
@@ -144,6 +147,8 @@ export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
 
         setRounds(newRounds);
         setChampion(null);
+        setChampionDisplayName('');
+        setIsEditingChampion(false);
     };
 
     const handleSetWinner = (matchupId: string, winner: UserProfile) => {
@@ -169,6 +174,7 @@ export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
         } else if (matchWon) {
             // This was the final match
             setChampion(winner);
+            setChampionDisplayName(winner.gamingName);
         }
 
         setRounds(newRoundsData);
@@ -188,7 +194,7 @@ export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
             <div className="space-y-6 max-w-2xl mx-auto">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Bracket Setup</CardTitle>
+                        <CardTitle>Tournament Setup</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                          <div className="grid grid-cols-2 gap-4">
@@ -248,10 +254,29 @@ export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
                     </CardHeader>
                     <CardContent>
                          <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-primary">
-                            <AvatarImage src={champion.photoUrl} alt={champion.gamingName} />
-                            <AvatarFallback>{getInitials(champion.gamingName)}</AvatarFallback>
+                            <AvatarImage src={champion.photoUrl} alt={championDisplayName || champion.gamingName} />
+                            <AvatarFallback>{getInitials(championDisplayName || champion.gamingName)}</AvatarFallback>
                         </Avatar>
-                        <h3 className="text-2xl font-bold">{champion.gamingName}</h3>
+                        {isEditingChampion ? (
+                            <div className="flex items-center gap-2 justify-center">
+                                <Input 
+                                    value={championDisplayName} 
+                                    onChange={(e) => setChampionDisplayName(e.target.value)}
+                                    className="max-w-[200px] text-center text-2xl font-bold"
+                                    autoFocus
+                                    onBlur={() => setIsEditingChampion(false)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') setIsEditingChampion(false); }}
+                                />
+                                <Button size="sm" onClick={() => setIsEditingChampion(false)}>Save</Button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 justify-center">
+                                <h3 className="text-2xl font-bold">{championDisplayName || champion.gamingName}</h3>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditingChampion(true)}>
+                                    <Pencil className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             )}
