@@ -4,7 +4,7 @@ import { PerformanceBadge } from "@/components/performance-badge";
 import { BarChart, Medal, TrendingUp, Zap } from "lucide-react";
 
 const PlayerCard = ({ player }: { player: PlayerResult }) => (
-    <Card className="w-full h-full flex flex-col bg-card/50 border-primary/20 backdrop-blur-sm text-center">
+    <Card className="w-full h-full flex flex-col bg-card/50 border-primary/20 backdrop-blur-sm text-center transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80">
       <CardHeader>
         <CardTitle className="font-headline text-3xl text-primary text-glow-primary">{player.name}</CardTitle>
       </CardHeader>

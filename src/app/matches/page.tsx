@@ -33,7 +33,7 @@ export default async function MatchesPage() {
              <h1 className="font-headline text-4xl mb-8 text-center">All Matches</h1>
              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {matches.map(match => (
-                    <Card key={match.id} className="bg-card/50">
+                    <Card key={match.id} className="bg-card/50 transition-all duration-300 ease-in-out hover:scale-[1.03] hover:border-primary/50">
                         <CardHeader>
                             <CardTitle>{match.player1.name} vs {match.player2.name}</CardTitle>
                             <CardDescription>

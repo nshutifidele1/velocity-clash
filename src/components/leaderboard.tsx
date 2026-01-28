@@ -34,10 +34,10 @@ export async function Leaderboard() {
             {leaderboard.map((player, index) => (
               <li
                 key={player.id}
-                className={`flex items-center justify-between p-3 rounded-md transition-all ${
+                className={`flex items-center justify-between p-3 rounded-md transition-all duration-300 ease-in-out ${
                   index === 0
                     ? "bg-primary/20 border border-primary box-glow-primary"
-                    : "bg-background/50"
+                    : "bg-background/50 hover:bg-muted/50 hover:scale-[1.02]"
                 }`}
               >
                 <div className="flex items-center gap-4">

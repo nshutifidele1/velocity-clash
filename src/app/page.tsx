@@ -82,33 +82,41 @@ export default function Home() {
         <section className="max-w-4xl mx-auto text-center mt-24">
             <h2 className="font-headline text-4xl mb-10 text-accent text-glow-accent">Meet The Visionaries</h2>
             <div className="grid md:grid-cols-2 gap-8">
-                <Card className="bg-card/50 text-center p-6 transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80">
-                    {imanLutfyImage && (
-                        <Image
-                            src={imanLutfyImage.imageUrl}
-                            alt={imanLutfyImage.description}
-                            data-ai-hint={imanLutfyImage.imageHint}
-                            width={150}
-                            height={150}
-                            className="rounded-full mx-auto mb-4 border-4 border-primary/50"
-                        />
-                    )}
-                    <h3 className="font-headline text-2xl text-primary">Imanzi Lutfy</h3>
-                    <p className="text-muted-foreground">Co-Creator</p>
+                <Card className="bg-card/50 text-center transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80 group">
+                    <CardContent className="p-6 flex flex-col items-center gap-2">
+                      {imanLutfyImage && (
+                          <Image
+                              src={imanLutfyImage.imageUrl}
+                              alt={imanLutfyImage.description}
+                              data-ai-hint={imanLutfyImage.imageHint}
+                              width={150}
+                              height={150}
+                              className="rounded-full mx-auto border-4 border-primary/50 group-hover:box-glow-primary transition-shadow duration-300"
+                          />
+                      )}
+                      <div>
+                        <h3 className="font-headline text-2xl text-primary mt-4">Imanzi Lutfy</h3>
+                        <p className="text-muted-foreground">Co-Creator</p>
+                      </div>
+                    </CardContent>
                 </Card>
-                <Card className="bg-card/50 text-center p-6 transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80">
-                    {nshutiFideleImage && (
-                        <Image
-                            src={nshutiFideleImage.imageUrl}
-                            alt={nshutiFideleImage.description}
-                            data-ai-hint={nshutiFideleImage.imageHint}
-                            width={150}
-                            height={150}
-                            className="rounded-full mx-auto mb-4 border-4 border-primary/50"
-                        />
-                    )}
-                    <h3 className="font-headline text-2xl text-primary">Nshuti Fidele</h3>
-                    <p className="text-muted-foreground">Co-Creator</p>
+                <Card className="bg-card/50 text-center transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80 group">
+                     <CardContent className="p-6 flex flex-col items-center gap-2">
+                        {nshutiFideleImage && (
+                            <Image
+                                src={nshutiFideleImage.imageUrl}
+                                alt={nshutiFideleImage.description}
+                                data-ai-hint={nshutiFideleImage.imageHint}
+                                width={150}
+                                height={150}
+                                className="rounded-full mx-auto border-4 border-primary/50 group-hover:box-glow-primary transition-shadow duration-300"
+                            />
+                        )}
+                        <div>
+                          <h3 className="font-headline text-2xl text-primary mt-4">Nshuti Fidele</h3>
+                          <p className="text-muted-foreground">Co-Creator</p>
+                        </div>
+                    </CardContent>
                 </Card>
             </div>
         </section>
