@@ -79,6 +79,24 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
   }
 }
 
+function shuffle<T>(array: T[]): T[] {
+  let currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex !== 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
 export async function autoGenerateMatch() {
     try {
         const usersCol = collection(db, "users");
@@ -86,13 +104,16 @@ export async function autoGenerateMatch() {
         const players = usersSnapshot.docs
             .map(doc => doc.data()?.gamingName)
             .filter(name => typeof name === 'string' && name.length > 0) as string[];
+        
+        const uniquePlayers = [...new Set(players)];
 
-        if (players.length < 2) {
-            return { error: "Not enough players to generate a match. At least 2 players are required." };
+        if (uniquePlayers.length < 2) {
+            return { error: "Not enough unique players to generate a match. At least 2 are required." };
         }
 
-        const player1Name = players[0];
-        const player2Name = players[1];
+        const shuffledPlayers = shuffle(uniquePlayers);
+        const player1Name = shuffledPlayers[0];
+        const player2Name = shuffledPlayers[1];
 
         // Generate random stats
         const player1Points = Math.floor(Math.random() * 4501) + 500;
