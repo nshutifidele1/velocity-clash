@@ -1,89 +1,52 @@
-import { db } from "@/lib/firebase";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { Button } from "@/components/ui/button";
-import { PlusCircle, Shapes } from "lucide-react";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { CreateLeagueForm } from "@/components/create-league-form";
-import type { League } from "@/lib/types";
+import { TournamentBracket } from "@/components/tournament-bracket";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { db } from "@/lib/firebase";
+import { UserProfile } from "@/lib/types";
+import { collection, getDocs } from "firebase/firestore";
+import { Shapes } from "lucide-react";
 
-async function getLeagues(): Promise<League[]> {
-    try {
-        const leaguesCol = collection(db, "leagues");
-        const q = query(leaguesCol, orderBy("name"));
-        const leaguesSnapshot = await getDocs(q);
-        const leaguesList = leaguesSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                name: data.name,
-            } as League;
-        });
-        return leaguesList;
-    } catch (error) {
-        console.error("Error fetching leagues: ", error);
-        return [];
-    }
+async function getPlayers(): Promise<UserProfile[]> {
+  try {
+    const usersCol = collection(db, "users");
+    const usersSnapshot = await getDocs(usersCol);
+    const usersList = usersSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            gamingName: data.gamingName,
+            experience: data.experience,
+            gender: data.gender,
+            photoUrl: data.photoUrl,
+            email: data.email,
+        } as UserProfile;
+    });
+    return usersList.filter(u => u.gamingName);
+  } catch (error) {
+    console.error("Error fetching users: ", error);
+    return [];
+  }
 }
 
+export default async function TournamentPage() {
+  const players = await getPlayers();
 
-export default async function AdminLeaguesPage() {
-    const leagues = await getLeagues();
-
-    return (
-        <Card>
-            <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                    <div>
-                        <CardTitle className="flex items-center gap-2">
-                            <Shapes className="h-6 w-6" />
-                            Leagues & Categories
-                        </CardTitle>
-                        <CardDescription>Manage racing leagues and event categories.</CardDescription>
-                    </div>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                Create New League
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Create a New League</DialogTitle>
-                                <DialogDescription>
-                                    Enter a name for your new league. This will help you categorize matches.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <CreateLeagueForm />
-                        </DialogContent>
-                    </Dialog>
+  return (
+    <div className="space-y-8">
+      <Card>
+        <CardHeader>
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <CardTitle className="flex items-center gap-2 font-headline text-3xl">
+                        <Shapes className="h-8 w-8" />
+                        Tournament Bracket
+                    </CardTitle>
+                    <CardDescription>Dynamic single-elimination tournament bracket for your leagues.</CardDescription>
                 </div>
-            </CardHeader>
-            <CardContent>
-                {leagues.length > 0 ? (
-                    <ul className="space-y-2">
-                        {leagues.map(league => (
-                            <li key={league.id} className="flex items-center justify-between rounded-md border p-4">
-                                <span className="font-medium">{league.name}</span>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <div className="text-center py-16 text-muted-foreground">
-                        <Shapes className="h-12 w-12 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold">No Leagues Found</h3>
-                        <p>Get started by creating your first racing league.</p>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
-    )
+            </div>
+        </CardHeader>
+        <CardContent>
+          <TournamentBracket initialPlayers={players} />
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

@@ -36,3 +36,18 @@ export interface League {
   id: string;
   name: string;
 }
+
+// New types for Tournament Bracket
+export interface BracketMatchup {
+  id: string;
+  round: number;
+  match: number;
+  players: (UserProfile | { gamingName: 'BYE' } | null)[];
+  winner: UserProfile | null;
+  nextMatchupId: string | null;
+}
+
+export interface BracketRound {
+  title: string;
+  matchups: BracketMatchup[];
+}
