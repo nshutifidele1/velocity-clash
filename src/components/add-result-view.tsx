@@ -14,6 +14,10 @@ export function AddResultView() {
   if (loading) {
     return (
         <div className="space-y-8">
+             <div className="text-center mb-12">
+                <Skeleton className="h-16 w-3/4 mx-auto" />
+                <Skeleton className="h-6 w-1/2 mx-auto mt-4" />
+            </div>
             <div className="grid md:grid-cols-2 gap-8">
                 <Card className="w-full bg-transparent border-secondary">
                     <CardHeader>
@@ -123,5 +127,17 @@ export function AddResultView() {
     );
   }
 
-  return <MatchForm />;
+  return (
+    <>
+      <div className="text-center mb-12">
+        <h1 className="font-headline text-5xl md:text-7xl font-bold text-primary text-glow-primary">
+          Enter Match Stats
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground">
+          Record the results of your latest race.
+        </p>
+      </div>
+      <MatchForm />
+    </>
+  );
 }
