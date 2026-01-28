@@ -83,7 +83,9 @@ export async function autoGenerateMatch() {
     try {
         const usersCol = collection(db, "users");
         const usersSnapshot = await getDocs(usersCol);
-        const players = usersSnapshot.docs.map(doc => doc.data().gamingName as string);
+        const players = usersSnapshot.docs
+            .map(doc => doc.data()?.gamingName)
+            .filter(name => typeof name === 'string' && name.length > 0) as string[];
 
         if (players.length < 2) {
             return { error: "Not enough players to generate a match. At least 2 players are required." };
