@@ -44,7 +44,7 @@ export default async function TournamentPage() {
             </div>
         </CardHeader>
         <CardContent>
-          <TournamentBracket initialPlayers={players} />
+          <TournamentBracket initialPlayers={players} storageKey="leagues-tournament" />
         </CardContent>
       </Card>
     </div>

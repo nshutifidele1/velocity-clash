@@ -111,7 +111,7 @@ export default async function AdminPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <TournamentBracket initialPlayers={players} />
+                    <TournamentBracket initialPlayers={players} storageKey="dashboard-tournament" />
                 </CardContent>
             </Card>
 

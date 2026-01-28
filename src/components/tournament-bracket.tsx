@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Crown, Trophy, Pencil } from 'lucide-react';
+import { Crown, Trophy, Pencil, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { UserProfile, BracketRound, BracketMatchup } from '@/lib/types';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ const BRACKET_SIZES = [4, 8, 16, 32, 64];
 
 interface TournamentBracketProps {
     initialPlayers: UserProfile[];
+    storageKey: string;
 }
 
 const getInitials = (name: string) => {
@@ -69,13 +70,53 @@ const MatchupCard = ({ matchup, onSelectWinner }: { matchup: BracketMatchup, onS
 };
 
 
-export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
+export function TournamentBracket({ initialPlayers, storageKey }: TournamentBracketProps) {
     const [size, setSize] = useState<number>(8);
     const [selectedPlayers, setSelectedPlayers] = useState<UserProfile[]>([]);
     const [rounds, setRounds] = useState<BracketRound[]>([]);
     const [champion, setChampion] = useState<UserProfile | null>(null);
     const [championDisplayName, setChampionDisplayName] = useState<string>('');
     const [isEditingChampion, setIsEditingChampion] = useState<boolean>(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    useEffect(() => {
+        try {
+            const savedState = localStorage.getItem(storageKey);
+            if (savedState) {
+                const { size, selectedPlayers, rounds, champion, championDisplayName } = JSON.parse(savedState);
+                if (size) setSize(size);
+                if (selectedPlayers) setSelectedPlayers(selectedPlayers);
+                if (rounds) setRounds(rounds);
+                if (champion) setChampion(champion);
+                if (championDisplayName) setChampionDisplayName(championDisplayName);
+            }
+        } catch (error) {
+            console.error(`Failed to load tournament state for key "${storageKey}"`, error);
+        }
+        setIsLoaded(true);
+    }, [storageKey]);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+        try {
+            const stateToSave = { size, selectedPlayers, rounds, champion, championDisplayName };
+            localStorage.setItem(storageKey, JSON.stringify(stateToSave));
+        } catch (error) {
+            console.error(`Failed to save tournament state for key "${storageKey}"`, error);
+        }
+    }, [size, selectedPlayers, rounds, champion, championDisplayName, storageKey, isLoaded]);
+
+    const resetBracket = () => {
+        setRounds([]);
+        setChampion(null);
+        setChampionDisplayName('');
+        setIsEditingChampion(false);
+        setSelectedPlayers([]);
+        setSize(8);
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(storageKey);
+        }
+    };
 
     const handlePlayerSelection = (player: UserProfile, isSelected: boolean) => {
         if (isSelected) {
@@ -189,6 +230,21 @@ export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
         2: "Finals"
     }
 
+    if (!isLoaded) {
+        return (
+             <Card>
+                <CardHeader>
+                    <CardTitle>Loading Tournament...</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center justify-center py-16">
+                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
+
     if (rounds.length === 0) {
         return (
             <div className="space-y-6 max-w-2xl mx-auto">
@@ -217,12 +273,12 @@ export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
                                     {initialPlayers.map(player => (
                                         <div key={player.email} className="flex items-center space-x-2">
                                             <Checkbox
-                                                id={player.email}
+                                                id={`${storageKey}-${player.email}`}
                                                 checked={selectedPlayers.some(p => p.email === player.email)}
                                                 onCheckedChange={(checked) => handlePlayerSelection(player, !!checked)}
                                                 disabled={selectedPlayers.length >= size && !selectedPlayers.some(p => p.email === player.email)}
                                             />
-                                            <Label htmlFor={player.email} className="font-normal">{player.gamingName}</Label>
+                                            <Label htmlFor={`${storageKey}-${player.email}`} className="font-normal">{player.gamingName}</Label>
                                         </div>
                                     ))}
                                 </div>
@@ -243,7 +299,7 @@ export function TournamentBracket({ initialPlayers }: TournamentBracketProps) {
         <div className="space-y-8">
             <div className="flex justify-between items-center">
                  <h2 className="text-2xl font-bold font-headline">{size}-Player Tournament</h2>
-                 <Button variant="outline" onClick={() => setRounds([])}>Reset Bracket</Button>
+                 <Button variant="outline" onClick={resetBracket}>Reset Bracket</Button>
             </div>
 
             {champion && (
