@@ -28,9 +28,9 @@ export function HeroCarousel() {
       className="absolute top-0 left-0 w-full h-full z-0"
       opts={{ loop: true }}
     >
-      <CarouselContent>
+      <CarouselContent className="h-full">
         {images.map((src, index) => (
-          <CarouselItem key={index}>
+          <CarouselItem key={index} className="relative">
             <Image
               src={src}
               alt={`Drifting Car ${index + 1}`}
