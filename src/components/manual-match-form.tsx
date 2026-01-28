@@ -16,13 +16,25 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { submitMatchResults } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { formSchema } from "@/lib/schemas";
+import type { UserProfile } from "@/lib/types";
 
-export function ManualMatchForm() {
+interface ManualMatchFormProps {
+  users: UserProfile[];
+}
+
+export function ManualMatchForm({ users }: ManualMatchFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
@@ -49,6 +61,14 @@ export function ManualMatchForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    if (values.player1.name === values.player2.name) {
+        toast({
+            variant: "destructive",
+            title: "Submission Error",
+            description: "Players cannot be the same.",
+        });
+        return;
+    }
     startTransition(async () => {
       const result = await submitMatchResults(values);
       if (result?.error) {
@@ -57,6 +77,12 @@ export function ManualMatchForm() {
             title: "Submission Error",
             description: result.error,
         });
+      } else {
+         toast({
+            title: "Match Created!",
+            description: "The manual match has been successfully submitted.",
+        });
+        form.reset();
       }
     });
   }
@@ -73,9 +99,20 @@ export function ManualMatchForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Player Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter name" {...field} />
-              </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a player" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        {users.map(user => (
+                            <SelectItem key={user.email} value={user.gamingName}>
+                                {user.gamingName}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
               <FormMessage />
             </FormItem>
           )}
