@@ -20,7 +20,7 @@ export function Header() {
 
                 <div className="flex flex-1 md:flex-none items-center justify-end space-x-4">
                      <Button asChild variant="ghost" size="sm">
-                        <Link href="#"><LogIn className="mr-2 h-4 w-4" /> Login</Link>
+                        <Link href="/login"><LogIn className="mr-2 h-4 w-4" /> Login</Link>
                     </Button>
                     <Button asChild size="sm">
                         <Link href="/register"><UserPlus className="mr-2 h-4 w-4" /> Register</Link>
