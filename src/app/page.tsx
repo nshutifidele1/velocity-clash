@@ -14,7 +14,6 @@ export default function Home() {
             alt="Drifting Car"
             fill
             className="object-cover"
-            priority
           />
           <div className="absolute inset-0 bg-black/50" />
         </div>
