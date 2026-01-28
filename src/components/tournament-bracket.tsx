@@ -8,10 +8,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Crown, Trophy, Pencil, Loader2 } from 'lucide-react';
+import { Crown, Trophy, Pencil, Loader2, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { UserProfile, BracketRound, BracketMatchup } from '@/lib/types';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 const BRACKET_SIZES = [4, 8, 16, 32, 64];
 
@@ -78,6 +79,7 @@ export function TournamentBracket({ initialPlayers, storageKey }: TournamentBrac
     const [championDisplayName, setChampionDisplayName] = useState<string>('');
     const [isEditingChampion, setIsEditingChampion] = useState<boolean>(false);
     const [isLoaded, setIsLoaded] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         try {
@@ -96,16 +98,24 @@ export function TournamentBracket({ initialPlayers, storageKey }: TournamentBrac
         setIsLoaded(true);
     }, [storageKey]);
 
-    useEffect(() => {
-        if (!isLoaded) return;
+    const saveBracket = () => {
         try {
             const stateToSave = { size, selectedPlayers, rounds, champion, championDisplayName };
             localStorage.setItem(storageKey, JSON.stringify(stateToSave));
+            toast({
+                title: "Bracket Saved",
+                description: "Your tournament progress has been saved to this browser.",
+            });
         } catch (error) {
             console.error(`Failed to save tournament state for key "${storageKey}"`, error);
+            toast({
+                variant: "destructive",
+                title: "Save Failed",
+                description: "Could not save the bracket. Check browser settings.",
+            });
         }
-    }, [size, selectedPlayers, rounds, champion, championDisplayName, storageKey, isLoaded]);
-
+    };
+    
     const resetBracket = () => {
         setRounds([]);
         setChampion(null);
@@ -299,7 +309,13 @@ export function TournamentBracket({ initialPlayers, storageKey }: TournamentBrac
         <div className="space-y-8">
             <div className="flex justify-between items-center">
                  <h2 className="text-2xl font-bold font-headline">{size}-Player Tournament</h2>
-                 <Button variant="outline" onClick={resetBracket}>Reset Bracket</Button>
+                 <div className="flex items-center gap-2">
+                    <Button onClick={saveBracket}>
+                        <Save className="mr-2 h-4 w-4" />
+                        Save Bracket
+                    </Button>
+                    <Button variant="outline" onClick={resetBracket}>Reset Bracket</Button>
+                 </div>
             </div>
 
             {champion && (
