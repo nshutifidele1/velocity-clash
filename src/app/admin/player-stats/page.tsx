@@ -41,11 +41,12 @@ async function getPlayerStats(): Promise<PlayerStatsSummary[]> {
                 gamesPlayed: 0,
                 wins: 0,
                 losses: 0,
-                totalPoints: 0,
                 winRate: 0,
+                totalPoints: 0,
                 avgPoints: 0,
                 totalPowerUpHits: 0,
                 avgPowerUpHits: 0,
+                totalFans: 0,
             };
         }
     });
@@ -81,6 +82,7 @@ async function getPlayerStats(): Promise<PlayerStatsSummary[]> {
         winRate: playerStat.gamesPlayed > 0 ? (playerStat.wins / playerStat.gamesPlayed) * 100 : 0,
         avgPoints: playerStat.gamesPlayed > 0 ? playerStat.totalPoints / playerStat.gamesPlayed : 0,
         avgPowerUpHits: playerStat.gamesPlayed > 0 ? playerStat.totalPowerUpHits / playerStat.gamesPlayed : 0,
+        totalFans: Math.floor((playerStat.totalPoints / 10) + (playerStat.wins * 50)),
     })).sort((a, b) => b.totalPoints - a.totalPoints);
 }
 
@@ -106,7 +108,7 @@ export default async function PlayerStatsPage() {
                             <TableHead className="text-right">Total Points</TableHead>
                             <TableHead className="text-right">Avg. Points</TableHead>
                             <TableHead className="text-right">Total Hits</TableHead>
-                            <TableHead className="text-right">Avg. Hits</TableHead>
+                            <TableHead className="text-right">Total Fans</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -128,7 +130,7 @@ export default async function PlayerStatsPage() {
                                 <TableCell className="text-right font-mono font-bold">{player.totalPoints.toLocaleString()}</TableCell>
                                 <TableCell className="text-right font-mono">{player.avgPoints.toFixed(0)}</TableCell>
                                 <TableCell className="text-right font-mono">{player.totalPowerUpHits.toLocaleString()}</TableCell>
-                                <TableCell className="text-right font-mono">{player.avgPowerUpHits.toFixed(1)}</TableCell>
+                                <TableCell className="text-right font-mono">{player.totalFans.toLocaleString()}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
