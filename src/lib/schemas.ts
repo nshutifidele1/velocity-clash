@@ -12,3 +12,16 @@ export const formSchema = z.object({
   player1: playerStatsSchema,
   player2: playerStatsSchema,
 });
+
+export const registerSchema = z.object({
+    gamingName: z.string().min(3, { message: "Gaming name must be at least 3 characters." }),
+    experience: z.enum(["Beginner", "Intermediate", "Pro"], { required_error: "Please select your experience level." }),
+    photoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
+    gender: z.enum(["Male", "Female", "Other", "Prefer not to say"], { required_error: "Please select your gender." }),
+    email: z.string().email({ message: "Invalid email address." }),
+    password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+    confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+});

@@ -23,3 +23,11 @@ export interface LeaderboardEntry {
   totalPoints: number;
   matchesPlayed: number;
 }
+
+export interface UserProfile {
+  gamingName: string;
+  experience: 'Beginner' | 'Intermediate' | 'Pro';
+  gender: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
+  photoUrl?: string;
+  email: string;
+}

@@ -23,7 +23,7 @@ export function Header() {
                         <Link href="#"><LogIn className="mr-2 h-4 w-4" /> Login</Link>
                     </Button>
                     <Button asChild size="sm">
-                        <Link href="#"><UserPlus className="mr-2 h-4 w-4" /> Register</Link>
+                        <Link href="/register"><UserPlus className="mr-2 h-4 w-4" /> Register</Link>
                     </Button>
                 </div>
             </div>
