@@ -1,11 +1,21 @@
+import { Github } from 'lucide-react';
+import Link from 'next/link';
+
 export function Footer() {
     return (
-        <footer className="py-6 md:px-8 md:py-0 border-t border-border/40 bg-background/95 mt-auto">
-            <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-                <p className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
-                    Built and designed by Imanzi Lutfy & Nshuti Fidele.
+        <footer className="py-8 md:py-12 border-t border-border/40 bg-background/95 mt-auto">
+            <div className="container flex flex-col items-center gap-4 text-center">
+                <h3 className="font-headline text-xl font-bold text-primary text-glow-primary">Velocity Clash</h3>
+                <p className="max-w-md text-balance text-sm leading-loose text-muted-foreground">
+                    Built and designed with passion by Imanzi Lutfy & Nshuti Fidele.
                 </p>
-                 <p className="text-center text-sm text-muted-foreground">
+                <div className="flex gap-4">
+                     <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                        <Github className="h-5 w-5" />
+                        <span className="sr-only">GitHub</span>
+                     </Link>
+                </div>
+                <p className="text-center text-xs text-muted-foreground/60 mt-4">
                     © {new Date().getFullYear()} Velocity Clash. All Rights Reserved.
                 </p>
             </div>
