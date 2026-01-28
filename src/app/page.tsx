@@ -3,6 +3,11 @@ import Link from "next/link";
 import { ArrowRight, Trophy, BarChart, Award } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
+import placeholderData from "@/lib/placeholder-images.json";
+
+const imanLutfyImage = placeholderData.placeholderImages.find(p => p.id === 'creator-imanzi');
+const nshutiFideleImage = placeholderData.placeholderImages.find(p => p.id === 'creator-fidele');
+
 
 export default function Home() {
   return (
@@ -38,7 +43,7 @@ export default function Home() {
             Our AI commentator even adds a little extra flavor to each showdown!
           </p>
           <div className="grid md:grid-cols-3 gap-8 mb-8">
-              <Card className="bg-card/50 text-center">
+              <Card className="bg-card/50 text-center transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80">
                   <CardHeader>
                       <Trophy className="h-12 w-12 mx-auto text-primary"/>
                       <CardTitle className="font-headline text-2xl text-primary">Log Wins</CardTitle>
@@ -47,7 +52,7 @@ export default function Home() {
                       <p className="text-muted-foreground">Quickly enter stats for each race to build your match history.</p>
                   </CardContent>
               </Card>
-               <Card className="bg-card/50 text-center">
+               <Card className="bg-card/50 text-center transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80">
                   <CardHeader>
                       <BarChart className="h-12 w-12 mx-auto text-primary"/>
                       <CardTitle className="font-headline text-2xl text-primary">Climb the Ranks</CardTitle>
@@ -56,7 +61,7 @@ export default function Home() {
                       <p className="text-muted-foreground">Watch the dynamic leaderboard to see who's dominating the competition.</p>
                   </CardContent>
               </Card>
-               <Card className="bg-card/50 text-center">
+               <Card className="bg-card/50 text-center transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80">
                   <CardHeader>
                       <Award className="h-12 w-12 mx-auto text-primary"/>
                       <CardTitle className="font-headline text-2xl text-primary">Earn Titles</CardTitle>
@@ -71,6 +76,41 @@ export default function Home() {
               Start a Match <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
+        </section>
+
+        {/* Meet the Creators Section */}
+        <section className="max-w-4xl mx-auto text-center mt-24">
+            <h2 className="font-headline text-4xl mb-10 text-accent text-glow-accent">Meet The Visionaries</h2>
+            <div className="grid md:grid-cols-2 gap-8">
+                <Card className="bg-card/50 text-center p-6 transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80">
+                    {imanLutfyImage && (
+                        <Image
+                            src={imanLutfyImage.imageUrl}
+                            alt={imanLutfyImage.description}
+                            data-ai-hint={imanLutfyImage.imageHint}
+                            width={150}
+                            height={150}
+                            className="rounded-full mx-auto mb-4 border-4 border-primary/50"
+                        />
+                    )}
+                    <h3 className="font-headline text-2xl text-primary">Imanzi Lutfy</h3>
+                    <p className="text-muted-foreground">Co-Creator</p>
+                </Card>
+                <Card className="bg-card/50 text-center p-6 transition-all duration-300 ease-in-out hover:scale-105 hover:border-primary/80">
+                    {nshutiFideleImage && (
+                        <Image
+                            src={nshutiFideleImage.imageUrl}
+                            alt={nshutiFideleImage.description}
+                            data-ai-hint={nshutiFideleImage.imageHint}
+                            width={150}
+                            height={150}
+                            className="rounded-full mx-auto mb-4 border-4 border-primary/50"
+                        />
+                    )}
+                    <h3 className="font-headline text-2xl text-primary">Nshuti Fidele</h3>
+                    <p className="text-muted-foreground">Co-Creator</p>
+                </Card>
+            </div>
         </section>
       </div>
     </main>
