@@ -35,6 +35,7 @@ export function ManualMatchForm() {
         totalPoints: 0,
         powerUpHits: 0,
         lapTime: '',
+        fansGained: '',
       },
       player2: {
         name: "",
@@ -42,6 +43,7 @@ export function ManualMatchForm() {
         totalPoints: 0,
         powerUpHits: 0,
         lapTime: '',
+        fansGained: '',
       },
     },
   });
@@ -134,6 +136,19 @@ export function ManualMatchForm() {
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name={`${player}.fansGained`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Fans Gained</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="Optional" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </CardContent>
     </Card>
   );

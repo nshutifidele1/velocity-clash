@@ -36,11 +36,13 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
       player1: {
         ...validatedData.player1,
         lapTime: Number(validatedData.player1.lapTime) || 0,
+        fansGained: Number(validatedData.player1.fansGained) || 0,
         title: aiResult.player1Title,
       },
       player2: {
         ...validatedData.player2,
         lapTime: Number(validatedData.player2.lapTime) || 0,
+        fansGained: Number(validatedData.player2.fansGained) || 0,
         title: aiResult.player2Title,
       },
       commentary: aiResult.commentary,

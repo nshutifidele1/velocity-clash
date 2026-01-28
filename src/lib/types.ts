@@ -4,6 +4,7 @@ export interface PlayerStats {
   totalPoints: number;
   powerUpHits: number;
   lapTime: number;
+  fansGained?: number;
 }
 
 export interface PlayerResult extends PlayerStats {

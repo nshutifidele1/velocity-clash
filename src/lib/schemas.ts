@@ -6,6 +6,7 @@ const playerStatsSchema = z.object({
   totalPoints: z.coerce.number().int().min(0),
   powerUpHits: z.coerce.number().int().min(0),
   lapTime: z.coerce.number().min(0).optional().or(z.literal('')),
+  fansGained: z.coerce.number().int().min(0).optional().or(z.literal('')),
 });
 
 export const formSchema = z.object({
