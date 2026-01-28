@@ -107,7 +107,7 @@ export default async function AdminPage() {
                         Live Tournament Bracket
                     </CardTitle>
                     <CardDescription>
-                        Create and manage a live tournament. Changes made here are independent of the 'Leagues' page.
+                        Create and manage a dynamic, single-elimination tournament bracket. Supports 4 to 64 players, automatic matchup generation, and responsive design. Select a winner to automatically advance them through the rounds and crown a champion. Changes made here are independent of the 'Leagues' page.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
