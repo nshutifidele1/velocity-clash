@@ -39,7 +39,7 @@ export default async function TournamentPage() {
                         <Shapes className="h-8 w-8" />
                         Tournament Bracket
                     </CardTitle>
-                    <CardDescription>Dynamic single-elimination tournament bracket for your leagues.</CardDescription>
+                    <CardDescription>Create and manage dynamic, single-elimination tournament brackets. Supports 4 to 64 players, automatic matchup generation, and responsive design. Select a winner to automatically advance them through the rounds and crown a champion.</CardDescription>
                 </div>
             </div>
         </CardHeader>
