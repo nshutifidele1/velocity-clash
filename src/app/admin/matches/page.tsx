@@ -18,7 +18,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, PlusCircle } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,7 +26,6 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { GenerateMatchesButton } from "@/components/generate-matches-button";
 
 async function getMatches(): Promise<MatchResult[]> {
   try {
@@ -59,7 +58,12 @@ export default async function AdminMatchesPage() {
                         <CardTitle>Matches</CardTitle>
                         <CardDescription>Manage all submitted match results.</CardDescription>
                     </div>
-                    <GenerateMatchesButton />
+                    <Button asChild>
+                        <Link href="/admin/matches/new">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            New Match
+                        </Link>
+                    </Button>
                 </div>
             </CardHeader>
             <CardContent>
