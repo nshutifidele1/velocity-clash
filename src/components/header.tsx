@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LogIn, UserPlus, LogOut, User as UserIcon } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 
@@ -26,6 +26,11 @@ import { Skeleton } from './ui/skeleton';
 export function Header() {
     const { user, profile, loading } = useUser();
     const router = useRouter();
+    const pathname = usePathname();
+
+    if (pathname.startsWith('/admin')) {
+        return null;
+    }
 
     const handleLogout = async () => {
         await signOut(auth);

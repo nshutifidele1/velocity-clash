@@ -1,7 +1,16 @@
+'use client';
+
 import { Github } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function Footer() {
+    const pathname = usePathname();
+
+    if (pathname.startsWith('/admin')) {
+        return null;
+    }
+
     return (
         <footer className="py-8 md:py-12 border-t border-border/40 bg-background/95 mt-auto">
             <div className="container flex flex-col items-center gap-4 text-center">
