@@ -1,9 +1,10 @@
 import { collection, getDocs, getCountFromServer } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Swords, BarChart } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Users, Swords, BarChart, Shapes } from "lucide-react";
 import { AdminChart } from "@/components/admin-chart";
-import type { MatchResult } from "@/lib/types";
+import type { MatchResult, UserProfile } from "@/lib/types";
+import { TournamentBracket } from "@/components/tournament-bracket";
 
 async function getStats() {
     const matchesCol = collection(db, "matches");
@@ -28,9 +29,31 @@ async function getStats() {
     };
 }
 
+async function getPlayers(): Promise<UserProfile[]> {
+    try {
+      const usersCol = collection(db, "users");
+      const usersSnapshot = await getDocs(usersCol);
+      const usersList = usersSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+              gamingName: data.gamingName,
+              experience: data.experience,
+              gender: data.gender,
+              photoUrl: data.photoUrl,
+              email: data.email,
+          } as UserProfile;
+      });
+      return usersList.filter(u => u.gamingName);
+    } catch (error) {
+      console.error("Error fetching users: ", error);
+      return [];
+    }
+  }
+
 
 export default async function AdminPage() {
     const { totalMatches, totalUsers, matches, averagePoints } = await getStats();
+    const players = await getPlayers();
 
     return (
         <div className="space-y-8">
@@ -74,6 +97,21 @@ export default async function AdminPage() {
                 </CardHeader>
                 <CardContent>
                     <AdminChart data={matches} />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline">
+                        <Shapes className="h-6 w-6" />
+                        Live Tournament Bracket
+                    </CardTitle>
+                    <CardDescription>
+                        Create and manage a live tournament. Changes made here are independent of the 'Leagues' page.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <TournamentBracket initialPlayers={players} />
                 </CardContent>
             </Card>
 
