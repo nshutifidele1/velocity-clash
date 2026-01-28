@@ -16,6 +16,7 @@ export interface MatchResult {
   player2: PlayerResult;
   commentary: string;
   timestamp: Date;
+  trackName?: string;
 }
 
 export interface LeaderboardEntry {
