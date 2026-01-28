@@ -4,6 +4,7 @@ import { ArrowRight, Trophy, BarChart, Award } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import placeholderData from "@/lib/placeholder-images.json";
+import { HeroCarousel } from "@/components/hero-carousel";
 
 const imanLutfyImage = placeholderData.placeholderImages.find(p => p.id === 'creator-imanzi');
 const nshutiFideleImage = placeholderData.placeholderImages.find(p => p.id === 'creator-fidele');
@@ -13,15 +14,8 @@ export default function Home() {
   return (
     <main>
       <section className="relative h-[60vh] flex items-center justify-center text-center text-white overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full z-0">
-          <Image
-            src="https://i.pinimg.com/736x/5f/2e/20/5f2e20080873abc0deae8d14ff09aba1.jpg"
-            alt="Drifting Car"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/50" />
-        </div>
+        <HeroCarousel />
+        <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative z-10 container mx-auto px-4">
           <h1 className="font-headline text-5xl md:text-7xl font-bold text-primary text-glow-primary">
