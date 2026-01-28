@@ -81,9 +81,9 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
 
 export async function autoGenerateMatch() {
     try {
-        const leaderboardCol = collection(db, "leaderboard");
-        const leaderboardSnapshot = await getDocs(leaderboardCol);
-        const players = leaderboardSnapshot.docs.map(doc => doc.data().id as string);
+        const usersCol = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCol);
+        const players = usersSnapshot.docs.map(doc => doc.data().gamingName as string);
 
         if (players.length < 2) {
             return { error: "Not enough players to generate a match. At least 2 players are required." };
