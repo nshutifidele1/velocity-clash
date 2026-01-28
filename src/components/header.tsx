@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { LogIn, UserPlus, PlusCircle } from 'lucide-react';
+import { LogIn, UserPlus } from 'lucide-react';
 
 export function Header() {
     return (
@@ -24,9 +24,6 @@ export function Header() {
                     </Button>
                     <Button asChild size="sm">
                         <Link href="#"><UserPlus className="mr-2 h-4 w-4" /> Register</Link>
-                    </Button>
-                     <Button asChild size="sm">
-                        <Link href="/add-result"><PlusCircle className="mr-2 h-4 w-4" /> Add Result</Link>
                     </Button>
                 </div>
             </div>
