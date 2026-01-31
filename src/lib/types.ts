@@ -24,6 +24,7 @@ export interface LeaderboardEntry {
   id: string; // Player name
   totalPoints: number;
   matchesPlayed: number;
+  photoUrl?: string;
 }
 
 export interface UserProfile {

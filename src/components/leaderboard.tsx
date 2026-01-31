@@ -1,16 +1,41 @@
 import { db } from "@/lib/firebase";
-import type { LeaderboardEntry } from "@/lib/types";
+import type { LeaderboardEntry, UserProfile } from "@/lib/types";
 import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
 import { Crown, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials } from "@/lib/utils";
 
 async function getLeaderboardData(): Promise<LeaderboardEntry[]> {
   try {
     const leaderboardCol = collection(db, "leaderboard");
-    const q = query(leaderboardCol, orderBy("totalPoints", "desc"), limit(10));
-    const leaderboardSnapshot = await getDocs(q);
+    const usersCol = collection(db, "users");
+
+    const [leaderboardSnapshot, usersSnapshot] = await Promise.all([
+        getDocs(query(leaderboardCol, orderBy("totalPoints", "desc"), limit(10))),
+        getDocs(usersCol)
+    ]);
+    
     const leaderboardList = leaderboardSnapshot.docs.map(doc => doc.data() as LeaderboardEntry);
-    return leaderboardList;
+
+    const usersMap = new Map<string, UserProfile>();
+    usersSnapshot.docs.forEach(doc => {
+        const user = doc.data() as UserProfile;
+        if (user.gamingName) {
+            usersMap.set(user.gamingName, user);
+        }
+    });
+
+    const combinedLeaderboard = leaderboardList.map(entry => {
+        const userProfile = usersMap.get(entry.id);
+        return {
+            ...entry,
+            photoUrl: userProfile?.photoUrl,
+        };
+    });
+
+    return combinedLeaderboard;
+
   } catch (error) {
     console.error("Error fetching leaderboard: ", error);
     return [];
@@ -48,10 +73,19 @@ export async function Leaderboard() {
                   >
                     {index + 1}
                   </span>
-                  <span className="font-headline text-lg font-semibold">{player.id}</span>
-                  {index === 0 && (
-                    <Crown className="h-5 w-5 text-yellow-400" style={{filter: 'drop-shadow(0 0 3px #facc15)'}} />
-                  )}
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={player.photoUrl} alt={player.id} />
+                    <AvatarFallback>{getInitials(player.id)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-headline text-lg font-semibold">{player.id}</span>
+                      {index === 0 && (
+                        <Crown className="h-5 w-5 text-yellow-400" style={{filter: 'drop-shadow(0 0 3px #facc15)'}} />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">{player.matchesPlayed} matches played</p>
+                  </div>
                 </div>
                 <div className="font-mono text-xl font-bold text-accent text-glow-accent">
                   {player.totalPoints.toLocaleString()} PTS
