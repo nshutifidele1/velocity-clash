@@ -17,12 +17,12 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
       player1FinishingPosition: validatedData.player1.finishingPosition,
       player1TotalPoints: validatedData.player1.totalPoints,
       player1PowerUpHits: validatedData.player1.powerUpHits,
-      player1LapTime: Number(validatedData.player1.lapTime) || undefined,
+      player1LapTime: validatedData.player1.lapTime !== '' ? Number(validatedData.player1.lapTime) : undefined,
       player2Name: validatedData.player2.name,
       player2FinishingPosition: validatedData.player2.finishingPosition,
       player2TotalPoints: validatedData.player2.totalPoints,
       player2PowerUpHits: validatedData.player2.powerUpHits,
-      player2LapTime: Number(validatedData.player2.lapTime) || undefined,
+      player2LapTime: validatedData.player2.lapTime !== '' ? Number(validatedData.player2.lapTime) : undefined,
     };
 
     const aiResult = await assignPerformanceTitles(aiInput);
