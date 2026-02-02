@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/firebase";
 import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc, deleteDoc, getDoc, query, where, getDocs } from "firebase/firestore";
 import { redirect } from "next/navigation";
-import { formSchema, upcomingMatchSchema } from "@/lib/schemas";
+import { formSchema, upcomingMatchSchema, playerStatsOnlySchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 import type { TournamentState, UserProfile, BracketMatchup } from "@/lib/types";
 
@@ -308,38 +308,41 @@ export async function deleteMatch(id: string) {
     const matchRef = doc(db, "matches", id);
     
     await runTransaction(db, async (transaction) => {
+        // --- READ PHASE ---
         const matchDoc = await transaction.get(matchRef);
         if (!matchDoc.exists()) {
             throw new Error("Match not found.");
         }
-
         const matchData = matchDoc.data();
         
-        // Player 1 update
         const p1Data = matchData.player1;
-        if (p1Data && p1Data.name) {
-            const player1Ref = doc(db, "leaderboard", p1Data.name.toLowerCase());
-            const player1Doc = await transaction.get(player1Ref);
-            if (player1Doc.exists()) {
-                const newPoints = player1Doc.data().totalPoints - p1Data.totalPoints;
-                const newMatches = Math.max(0, player1Doc.data().matchesPlayed - 1);
-                transaction.update(player1Ref, { totalPoints: newPoints, matchesPlayed: newMatches });
-            }
-        }
-        
-        // Player 2 update
         const p2Data = matchData.player2;
+
+        let player1Ref, player1Doc, player2Ref, player2Doc;
+
+        if (p1Data && p1Data.name) {
+            player1Ref = doc(db, "leaderboard", p1Data.name.toLowerCase());
+            player1Doc = await transaction.get(player1Ref);
+        }
+
         if (p2Data && p2Data.name) {
-            const player2Ref = doc(db, "leaderboard", p2Data.name.toLowerCase());
-            const player2Doc = await transaction.get(player2Ref);
-            if (player2Doc.exists()) {
-                const newPoints = player2Doc.data().totalPoints - p2Data.totalPoints;
-                const newMatches = Math.max(0, player2Doc.data().matchesPlayed - 1);
-                transaction.update(player2Ref, { totalPoints: newPoints, matchesPlayed: newMatches });
-            }
+            player2Ref = doc(db, "leaderboard", p2Data.name.toLowerCase());
+            player2Doc = await transaction.get(player2Ref);
+        }
+
+        // --- WRITE PHASE ---
+        if (p1Data && p1Data.name && player1Ref && player1Doc?.exists()) {
+            const newPoints = player1Doc.data().totalPoints - p1Data.totalPoints;
+            const newMatches = Math.max(0, player1Doc.data().matchesPlayed - 1);
+            transaction.update(player1Ref, { totalPoints: newPoints, matchesPlayed: newMatches });
         }
         
-        // Delete match
+        if (p2Data && p2Data.name && player2Ref && player2Doc?.exists()) {
+            const newPoints = player2Doc.data().totalPoints - p2Data.totalPoints;
+            const newMatches = Math.max(0, player2Doc.data().matchesPlayed - 1);
+            transaction.update(player2Ref, { totalPoints: newPoints, matchesPlayed: newMatches });
+        }
+        
         transaction.delete(matchRef);
     });
 
