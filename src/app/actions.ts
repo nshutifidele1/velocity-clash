@@ -9,6 +9,7 @@ import { formSchema, upcomingMatchSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 
 export async function submitMatchResults(values: z.infer<typeof formSchema>, upcomingMatchId?: string) {
+  let matchRefId: string;
   try {
     const validatedData = formSchema.parse(values);
 
@@ -60,6 +61,7 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
     };
     
     const matchRef = doc(collection(db, "matches"));
+    matchRefId = matchRef.id;
 
     const tracks = ["City Park", "Mountain Pass", "Coastal Highway", "Desert Run", "Neon Alley"];
     const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
@@ -128,22 +130,18 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
     if (upcomingMatchId) {
         revalidatePath("/admin/upcoming-matches");
     }
-
-    redirect(`/results?id=${matchRef.id}`);
-
   } catch (error) {
     console.error("Error submitting match results:", error);
     if (error instanceof z.ZodError) {
         return { error: "Validation failed", details: error.flatten() };
     }
     if (error instanceof Error) {
-        if (error.message.includes('Please pass in the API key') || error.message.includes('API key not valid')) {
-            return { error: 'AI service authentication failed. Please ensure your GEMINI_API_KEY is configured correctly in the .env file.' };
-        }
         return { error: error.message };
     }
     return { error: "An unexpected error occurred on the server." };
   }
+
+  redirect(`/results?id=${matchRefId}`);
 }
 
 export async function addUpcomingMatch(values: z.infer<typeof upcomingMatchSchema>) {
