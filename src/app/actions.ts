@@ -25,11 +25,13 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
       player1TotalPoints: validatedData.player1.totalPoints,
       player1PowerUpHits: validatedData.player1.powerUpHits,
       player1LapTime: p1LapTimeNum,
+      player1SpeedRank: p1LapTimeNum ? undefined : Math.floor(Math.random() * 10) + 1,
       player2Name: validatedData.player2.name,
       player2FinishingPosition: validatedData.player2.finishingPosition,
       player2TotalPoints: validatedData.player2.totalPoints,
       player2PowerUpHits: validatedData.player2.powerUpHits,
       player2LapTime: p2LapTimeNum,
+      player2SpeedRank: p2LapTimeNum ? undefined : Math.floor(Math.random() * 10) + 1,
     };
 
     const aiResult = await assignPerformanceTitles(aiInput);
@@ -45,7 +47,7 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
         finishingPosition: validatedData.player1.finishingPosition,
         totalPoints: validatedData.player1.totalPoints,
         powerUpHits: validatedData.player1.powerUpHits,
-        lapTime: p1LapTimeNum || 0,
+        lapTime: p1LapTimeNum ?? 0,
         fansGained: p1FansGainedNum,
         title: aiResult.player1Title,
       },
@@ -54,7 +56,7 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
         finishingPosition: validatedData.player2.finishingPosition,
         totalPoints: validatedData.player2.totalPoints,
         powerUpHits: validatedData.player2.powerUpHits,
-        lapTime: p2LapTimeNum || 0,
+        lapTime: p2LapTimeNum ?? 0,
         fansGained: p2FansGainedNum,
         title: aiResult.player2Title,
       },
@@ -108,6 +110,9 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
         return { error: "Validation failed", details: error.flatten() };
     }
     if (error instanceof Error) {
+        if (error.message.includes('Please pass in the API key') || error.message.includes('API key not valid')) {
+            return { error: 'AI service authentication failed. Please ensure your GEMINI_API_KEY is configured correctly in the .env file.' };
+        }
         return { error: error.message };
     }
     return { error: "An unexpected error occurred on the server." };
