@@ -75,3 +75,11 @@ export interface UpcomingMatch {
   player2Name: string;
   time: Date;
 }
+
+export interface TournamentState {
+    size: number;
+    selectedPlayers: UserProfile[];
+    rounds: BracketRound[];
+    champion: UserProfile | null;
+    championDisplayName: string;
+}

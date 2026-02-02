@@ -3,10 +3,11 @@
 import "dotenv/config";
 import { z } from "zod";
 import { db } from "@/lib/firebase";
-import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { redirect } from "next/navigation";
 import { formSchema, upcomingMatchSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
+import type { TournamentState } from "@/lib/types";
 
 export async function submitMatchResults(values: z.infer<typeof formSchema>, upcomingMatchId?: string) {
   let matchRefId: string;
@@ -183,4 +184,60 @@ export async function deleteUpcomingMatch(id: string) {
     console.error("Error deleting upcoming match:", error);
     return { error: "An unexpected error occurred on the server." };
   }
+}
+
+export async function saveTournamentBracket(storageKey: string, state: TournamentState) {
+    try {
+        if (!storageKey) {
+            return { error: "Storage key is required." };
+        }
+        const bracketRef = doc(db, "tournaments", storageKey);
+        await setDoc(bracketRef, state);
+        return { success: "Bracket saved successfully." };
+    } catch (error) {
+        console.error("Error saving tournament bracket:", error);
+        return { error: "An unexpected error occurred while saving the bracket." };
+    }
+}
+
+export async function loadTournamentBracket(storageKey: string): Promise<{ data?: TournamentState; error?: string }> {
+    try {
+        if (!storageKey) {
+            return { error: "Storage key is required." };
+        }
+        const bracketRef = doc(db, "tournaments", storageKey);
+        const bracketSnap = await getDoc(bracketRef);
+
+        if (bracketSnap.exists()) {
+            const data = bracketSnap.data();
+            const validatedData: TournamentState = {
+                size: data.size || 8,
+                selectedPlayers: data.selectedPlayers || [],
+                rounds: data.rounds || [],
+                champion: data.champion || null,
+                championDisplayName: data.championDisplayName || ''
+            };
+            return { data: validatedData };
+        }
+        return { data: undefined };
+
+    } catch (error) {
+        console.error("Error loading tournament bracket:", error);
+        return { error: "An unexpected error occurred while loading the bracket." };
+    }
+}
+
+export async function deleteTournamentBracket(storageKey: string) {
+    try {
+        if (!storageKey) {
+            return { error: "Storage key is required." };
+        }
+        await deleteDoc(doc(db, "tournaments", storageKey));
+        revalidatePath("/admin/leagues");
+        revalidatePath("/admin");
+        return { success: "Bracket reset successfully." };
+    } catch (error) {
+        console.error("Error deleting tournament bracket:", error);
+        return { error: "An unexpected error occurred while resetting the bracket." };
+    }
 }

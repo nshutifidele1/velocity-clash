@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -10,9 +10,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Crown, Trophy, Pencil, Loader2, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { UserProfile, BracketRound, BracketMatchup } from '@/lib/types';
+import type { UserProfile, BracketRound, BracketMatchup, TournamentState } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { saveTournamentBracket, loadTournamentBracket, deleteTournamentBracket } from '@/app/actions';
 
 const BRACKET_SIZES = [4, 8, 16, 32, 64];
 
@@ -80,52 +81,75 @@ export function TournamentBracket({ initialPlayers, storageKey }: TournamentBrac
     const [isEditingChampion, setIsEditingChampion] = useState<boolean>(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
-        try {
-            const savedState = localStorage.getItem(storageKey);
-            if (savedState) {
-                const { size, selectedPlayers, rounds, champion, championDisplayName } = JSON.parse(savedState);
-                if (size) setSize(size);
-                if (selectedPlayers) setSelectedPlayers(selectedPlayers);
-                if (rounds) setRounds(rounds);
-                if (champion) setChampion(champion);
-                if (championDisplayName) setChampionDisplayName(championDisplayName);
+        const loadData = async () => {
+            try {
+                const result = await loadTournamentBracket(storageKey);
+                if (result.error) {
+                    toast({ variant: 'destructive', title: 'Load Failed', description: result.error });
+                } else if (result.data) {
+                    const { size, selectedPlayers, rounds, champion, championDisplayName } = result.data;
+                    setSize(size);
+                    setSelectedPlayers(selectedPlayers);
+                    setRounds(rounds);
+                    setChampion(champion);
+                    setChampionDisplayName(championDisplayName);
+                }
+            } catch (error) {
+                console.error(`Failed to load tournament state for key "${storageKey}"`, error);
+                 toast({ variant: 'destructive', title: 'Load Failed', description: 'Could not load bracket data from server.' });
+            } finally {
+                setIsLoaded(true);
             }
-        } catch (error) {
-            console.error(`Failed to load tournament state for key "${storageKey}"`, error);
-        }
-        setIsLoaded(true);
-    }, [storageKey]);
+        };
+        
+        loadData();
+    }, [storageKey, toast]);
 
     const saveBracket = () => {
-        try {
-            const stateToSave = { size, selectedPlayers, rounds, champion, championDisplayName };
-            localStorage.setItem(storageKey, JSON.stringify(stateToSave));
-            toast({
-                title: "Bracket Saved",
-                description: "Your tournament progress has been saved to this browser.",
-            });
-        } catch (error) {
-            console.error(`Failed to save tournament state for key "${storageKey}"`, error);
-            toast({
-                variant: "destructive",
-                title: "Save Failed",
-                description: "Could not save the bracket. Check browser settings.",
-            });
-        }
+        startTransition(async () => {
+            const stateToSave: TournamentState = { size, selectedPlayers, rounds, champion, championDisplayName };
+            const result = await saveTournamentBracket(storageKey, stateToSave);
+
+            if (result.error) {
+                 toast({
+                    variant: "destructive",
+                    title: "Save Failed",
+                    description: result.error,
+                });
+            } else {
+                toast({
+                    title: "Bracket Saved",
+                    description: "Your tournament progress has been saved to the database.",
+                });
+            }
+        });
     };
     
     const resetBracket = () => {
-        setRounds([]);
-        setChampion(null);
-        setChampionDisplayName('');
-        setIsEditingChampion(false);
-        setSelectedPlayers([]);
-        setSize(8);
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem(storageKey);
-        }
+        startTransition(async () => {
+            const result = await deleteTournamentBracket(storageKey);
+            if (result.error) {
+                toast({
+                    variant: "destructive",
+                    title: "Reset Failed",
+                    description: result.error,
+                });
+            } else {
+                setRounds([]);
+                setChampion(null);
+                setChampionDisplayName('');
+                setIsEditingChampion(false);
+                setSelectedPlayers([]);
+                setSize(8);
+                 toast({
+                    title: "Bracket Reset",
+                    description: "The tournament bracket has been cleared.",
+                });
+            }
+        });
     };
 
     const handlePlayerSelection = (player: UserProfile, isSelected: boolean) => {
@@ -310,11 +334,13 @@ export function TournamentBracket({ initialPlayers, storageKey }: TournamentBrac
             <div className="flex justify-between items-center">
                  <h2 className="text-2xl font-bold font-headline">{size}-Player Tournament</h2>
                  <div className="flex items-center gap-2">
-                    <Button onClick={saveBracket}>
-                        <Save className="mr-2 h-4 w-4" />
+                    <Button onClick={saveBracket} disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                         Save Bracket
                     </Button>
-                    <Button variant="outline" onClick={resetBracket}>Reset Bracket</Button>
+                    <Button variant="outline" onClick={resetBracket} disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Reset Bracket'}
+                    </Button>
                  </div>
             </div>
 
