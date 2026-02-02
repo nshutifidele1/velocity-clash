@@ -1,15 +1,20 @@
+
 "use server";
 
 import "dotenv/config";
 import { z } from "zod";
 import { db } from "@/lib/firebase";
-import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc, deleteDoc, getDoc, query, where, getDocs } from "firebase/firestore";
 import { redirect } from "next/navigation";
 import { formSchema, upcomingMatchSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
-import type { TournamentState } from "@/lib/types";
+import type { TournamentState, UserProfile, BracketMatchup } from "@/lib/types";
 
-export async function submitMatchResults(values: z.infer<typeof formSchema>, upcomingMatchId?: string) {
+export async function submitMatchResults(
+    values: z.infer<typeof formSchema>, 
+    upcomingMatchId?: string,
+    tournamentInfo?: { storageKey: string, matchupId: string }
+) {
   let matchRefId: string;
   try {
     const validatedData = formSchema.parse(values);
@@ -124,6 +129,47 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
       }
     });
 
+    if (tournamentInfo) {
+      const bracketData = await loadTournamentBracket(tournamentInfo.storageKey);
+      if (bracketData.data) {
+          const bracket = bracketData.data;
+
+          const winnerNameVal = validatedData.winner === 'player1' ? validatedData.player1.name : validatedData.player2.name;
+          
+          const usersQuery = query(collection(db, "users"), where("gamingName", "==", winnerNameVal));
+          const usersSnapshot = await getDocs(usersQuery);
+
+          if (!usersSnapshot.empty) {
+              const winnerProfile = usersSnapshot.docs[0].data() as UserProfile;
+
+              let matchWon: BracketMatchup | null = null;
+              for (const round of bracket.rounds) {
+                  const matchup = round.matchups.find(m => m.id === tournamentInfo.matchupId);
+                  if (matchup) {
+                      matchup.winner = winnerProfile;
+                      matchWon = matchup;
+                      break;
+                  }
+              }
+
+              if (matchWon && matchWon.nextMatchupId) {
+                  const [nextRoundIndex, nextMatchIndex] = matchWon.nextMatchupId.match(/r(\d+)m(\d+)/)!.slice(1).map(Number);
+                  const nextMatch = bracket.rounds[nextRoundIndex]?.matchups[nextMatchIndex];
+                  if (nextMatch) {
+                      const slot = matchWon.match % 2 === 0 ? 0 : 1;
+                      nextMatch.players[slot] = winnerProfile;
+                  }
+              } else if (matchWon) {
+                  // Final match
+                  bracket.champion = winnerProfile;
+                  bracket.championDisplayName = winnerProfile.gamingName;
+              }
+              
+              await saveTournamentBracket(tournamentInfo.storageKey, bracket);
+          }
+      }
+    }
+
     revalidatePath("/admin/matches");
     revalidatePath("/matches");
     revalidatePath("/leaderboard-page");
@@ -131,6 +177,11 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
     if (upcomingMatchId) {
         revalidatePath("/admin/upcoming-matches");
     }
+    if (tournamentInfo) {
+      revalidatePath('/admin/leagues');
+      revalidatePath('/admin');
+    }
+
   } catch (error) {
     console.error("Error submitting match results:", error);
     if (error instanceof z.ZodError) {
@@ -142,7 +193,11 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
     return { error: "An unexpected error occurred on the server." };
   }
 
-  redirect(`/results?id=${matchRefId}`);
+  if (tournamentInfo) {
+    redirect('/admin/leagues');
+  } else {
+    redirect(`/results?id=${matchRefId}`);
+  }
 }
 
 export async function addUpcomingMatch(values: z.infer<typeof upcomingMatchSchema>) {
@@ -210,6 +265,7 @@ export async function loadTournamentBracket(storageKey: string): Promise<{ data?
 
         if (bracketSnap.exists()) {
             const data = bracketSnap.data();
+            // Simple validation, a more robust solution would use Zod
             const validatedData: TournamentState = {
                 size: data.size || 8,
                 selectedPlayers: data.selectedPlayers || [],

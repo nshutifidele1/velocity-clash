@@ -1,6 +1,8 @@
+
 "use client";
 
 import { useState, useEffect, useTransition } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Crown, Trophy, Pencil, Loader2, Save } from 'lucide-react';
+import { Crown, Trophy, Pencil, Loader2, Save, ClipboardList } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { UserProfile, BracketRound, BracketMatchup, TournamentState } from '@/lib/types';
 import { Input } from '@/components/ui/input';
@@ -27,7 +29,7 @@ const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('');
 };
 
-const MatchupCard = ({ matchup, onSelectWinner }: { matchup: BracketMatchup, onSelectWinner: (matchupId: string, winner: UserProfile) => void }) => {
+const MatchupCard = ({ matchup, onSelectWinner, storageKey }: { matchup: BracketMatchup, onSelectWinner: (matchupId: string, winner: UserProfile) => void, storageKey: string }) => {
     const [player1, player2] = matchup.players;
 
     const handleWin = (winner: UserProfile) => {
@@ -35,6 +37,8 @@ const MatchupCard = ({ matchup, onSelectWinner }: { matchup: BracketMatchup, onS
             onSelectWinner(matchup.id, winner);
         }
     };
+
+    const canPlay = player1 && player1.gamingName !== 'BYE' && player2 && player2.gamingName !== 'BYE' && !matchup.winner;
 
     const PlayerDisplay = ({ player }: { player: UserProfile | { gamingName: 'BYE' } | null }) => {
         if (!player) {
@@ -53,7 +57,7 @@ const MatchupCard = ({ matchup, onSelectWinner }: { matchup: BracketMatchup, onS
                     <AvatarFallback>{getInitials((player as UserProfile).gamingName)}</AvatarFallback>
                 </Avatar>
                 <span className="font-medium text-sm">{(player as UserProfile).gamingName}</span>
-                {matchup.players.length === 2 && matchup.players.every(p => p) && !matchup.winner && (
+                {canPlay && (
                     <Button size="sm" variant="ghost" className="ml-auto" onClick={() => handleWin(player as UserProfile)}>
                         <Crown className="h-4 w-4 text-yellow-400" />
                     </Button>
@@ -64,6 +68,14 @@ const MatchupCard = ({ matchup, onSelectWinner }: { matchup: BracketMatchup, onS
 
     return (
         <div className="relative flex flex-col gap-2 p-3 bg-card rounded-lg border w-64 min-h-[10rem] justify-center">
+            {canPlay && (
+                <Button asChild size="icon" variant="ghost" className="absolute top-1 right-1 h-7 w-7 text-muted-foreground hover:text-accent">
+                    <Link href={`/admin/matches/new?p1name=${(player1 as UserProfile).gamingName}&p2name=${(player2 as UserProfile).gamingName}&storageKey=${storageKey}&matchupId=${matchup.id}`}>
+                        <ClipboardList className="h-4 w-4" />
+                        <span className="sr-only">Enter Full Results</span>
+                    </Link>
+                </Button>
+            )}
             <PlayerDisplay player={player1} />
             <div className="h-px bg-border w-full" />
             <PlayerDisplay player={player2} />
@@ -387,7 +399,7 @@ export function TournamentBracket({ initialPlayers, storageKey }: TournamentBrac
                             <div className="flex flex-col" style={{gap: `${Math.pow(2, roundIndex) * 3.5}rem`}}>
                                 {round.matchups.map((matchup) => (
                                     <div key={matchup.id} className="relative">
-                                        <MatchupCard matchup={matchup} onSelectWinner={handleSetWinner} />
+                                        <MatchupCard matchup={matchup} onSelectWinner={handleSetWinner} storageKey={storageKey} />
                                         {/* Connector Lines */}
                                         {roundIndex < rounds.length -1 && (
                                             <>

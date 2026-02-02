@@ -26,9 +26,15 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 interface DirectMatchFormProps {
     players: UserProfile[];
+    p1name?: string;
+    p2name?: string;
+    tournamentParams?: {
+        storageKey: string;
+        matchupId: string;
+    };
 }
 
-export function DirectMatchForm({ players }: DirectMatchFormProps) {
+export function DirectMatchForm({ players, p1name, p2name, tournamentParams }: DirectMatchFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
@@ -36,14 +42,14 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       player1: {
-        name: "",
+        name: p1name || "",
         totalPoints: 0,
         powerUpHits: 0,
         lapTime: '',
         fansGained: '',
       },
       player2: {
-        name: "",
+        name: p2name || "",
         totalPoints: 0,
         powerUpHits: 0,
         lapTime: '',
@@ -54,7 +60,7 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
-      const result = await submitMatchResults(values);
+      const result = await submitMatchResults(values, undefined, tournamentParams);
       if (result?.error) {
         let description = result.error;
         if (result.details) {
@@ -73,6 +79,7 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
 
   const player1Name = form.watch("player1.name");
   const player2Name = form.watch("player2.name");
+  const arePlayersPreselected = !!(p1name && p2name);
 
   const renderPlayerFields = (player: "player1" | "player2", title: string) => (
     <Card className="w-full bg-transparent border-secondary">
@@ -86,7 +93,7 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Player Name</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value || ""}>
+              <Select onValueChange={field.onChange} value={field.value || ""} disabled={arePlayersPreselected}>
                     <FormControl>
                         <SelectTrigger>
                         <SelectValue placeholder="Select a player" />

@@ -26,8 +26,14 @@ async function getUsers(): Promise<UserProfile[]> {
     }
 }
 
-export default async function NewMatchPage() {
+export default async function NewMatchPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined }}) {
     const players = await getUsers();
+    const { p1name, p2name, storageKey, matchupId } = searchParams;
+
+    const tournamentParams = storageKey && matchupId ? {
+        storageKey: String(storageKey),
+        matchupId: String(matchupId),
+    } : undefined;
 
     return (
         <Card>
@@ -39,7 +45,12 @@ export default async function NewMatchPage() {
                 <CardDescription>Directly enter the stats for a completed match that was not scheduled.</CardDescription>
             </CardHeader>
             <CardContent>
-                <DirectMatchForm players={players} />
+                <DirectMatchForm 
+                    players={players} 
+                    p1name={p1name as string}
+                    p2name={p2name as string}
+                    tournamentParams={tournamentParams}
+                />
             </CardContent>
         </Card>
     );
