@@ -5,7 +5,7 @@ export const playerStatsOnlySchema = z.object({
   powerUpHits: z.coerce.number().int().min(0, "Hits cannot be negative."),
   lapTime: z.preprocess(
     (val) => (val === "" || val === null ? undefined : val),
-    z.coerce.number({ invalid_type_error: "Lap time must be a number" }).optional()
+    z.coerce.number({ invalid_type_error: "Lap time must be a number" }).max(9, "Lap time cannot be greater than 9.").optional()
   ),
   fansGained: z.preprocess(
     (val) => (val === "" || val === null ? undefined : val),
