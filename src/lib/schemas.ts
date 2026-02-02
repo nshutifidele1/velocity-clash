@@ -12,6 +12,9 @@ const playerStatsSchema = z.object({
 export const formSchema = z.object({
   player1: playerStatsSchema,
   player2: playerStatsSchema,
+}).refine(data => data.player1.name !== data.player2.name, {
+    message: "Players cannot be the same person.",
+    path: ["player2", "name"],
 });
 
 export const registerSchema = z.object({
