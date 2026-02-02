@@ -2,7 +2,6 @@
 
 import "dotenv/config";
 import { z } from "zod";
-import { assignPerformanceTitles } from "@/ai/flows/assign-performance-titles";
 import { db } from "@/lib/firebase";
 import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { redirect } from "next/navigation";
@@ -23,22 +22,42 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
     const p2FansGainedNum = validatedData.player2.fansGained || 0;
 
 
-    const aiInput = {
-      player1Name: validatedData.player1.name,
-      player1FinishingPosition: p1FinishingPosition,
-      player1TotalPoints: validatedData.player1.totalPoints,
-      player1PowerUpHits: validatedData.player1.powerUpHits,
-      player1LapTime: p1LapTimeNum,
-      player1SpeedRank: p1LapTimeNum ? undefined : Math.floor(Math.random() * 10) + 1,
-      player2Name: validatedData.player2.name,
-      player2FinishingPosition: p2FinishingPosition,
-      player2TotalPoints: validatedData.player2.totalPoints,
-      player2PowerUpHits: validatedData.player2.powerUpHits,
-      player2LapTime: p2LapTimeNum,
-      player2SpeedRank: p2LapTimeNum ? undefined : Math.floor(Math.random() * 10) + 1,
-    };
+    // AI call is replaced with deterministic logic to ensure stability.
+    let p1Title = '';
+    let p2Title = '';
+    
+    if (validatedData.winner === 'player1') {
+        p1Title = 'Match Winner';
+    } else {
+        p2Title = 'Match Winner';
+    }
 
-    const aiResult = await assignPerformanceTitles(aiInput);
+    if (validatedData.player1.powerUpHits > validatedData.player2.powerUpHits) {
+        if (!p1Title) p1Title = 'Most Shooter';
+    } else if (validatedData.player2.powerUpHits > validatedData.player1.powerUpHits) {
+        if (!p2Title) p2Title = 'Most Shooter';
+    }
+
+    if (p1LapTimeNum && p2LapTimeNum) {
+        if (p1LapTimeNum < p2LapTimeNum) {
+            if (!p1Title) p1Title = 'Fastest Driver';
+        } else if (p2LapTimeNum < p1LapTimeNum) {
+            if (!p2Title) p2Title = 'Fastest Driver';
+        }
+    }
+
+    // Fallback titles
+    if (!p1Title) p1Title = "Valiant Rival";
+    if (!p2Title) p2Title = "Valiant Rival";
+
+    const winnerName = validatedData.winner === 'player1' ? validatedData.player1.name : validatedData.player2.name;
+    const commentary = `A hard-fought battle! ${winnerName} clinched the victory after an intense race.`;
+
+    const result = {
+      player1Title: p1Title,
+      player2Title: p2Title,
+      commentary: commentary,
+    };
     
     const matchRef = doc(collection(db, "matches"));
 
@@ -53,7 +72,7 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
         powerUpHits: validatedData.player1.powerUpHits,
         lapTime: p1LapTimeNum ?? 0,
         fansGained: p1FansGainedNum,
-        title: aiResult.player1Title,
+        title: result.player1Title,
       },
       player2: {
         name: validatedData.player2.name,
@@ -62,9 +81,9 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
         powerUpHits: validatedData.player2.powerUpHits,
         lapTime: p2LapTimeNum ?? 0,
         fansGained: p2FansGainedNum,
-        title: aiResult.player2Title,
+        title: result.player2Title,
       },
-      commentary: aiResult.commentary,
+      commentary: result.commentary,
       trackName: randomTrack,
       timestamp: serverTimestamp(),
     };
