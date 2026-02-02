@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-const playerStatsSchema = z.object({
-  name: z.string().min(1, "Player name is required."),
+export const playerStatsOnlySchema = z.object({
   totalPoints: z.coerce.number().int().min(0, "Points cannot be negative."),
   powerUpHits: z.coerce.number().int().min(0, "Hits cannot be negative."),
   lapTime: z.preprocess(
@@ -12,6 +11,10 @@ const playerStatsSchema = z.object({
     (val) => (val === "" || val === null ? undefined : val),
     z.coerce.number({ invalid_type_error: "Fans gained must be a number" }).optional()
   ),
+});
+
+const playerStatsSchema = playerStatsOnlySchema.extend({
+  name: z.string().min(1, "Player name is required."),
 });
 
 export const formSchema = z.object({

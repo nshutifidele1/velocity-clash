@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
+import { z } from "zod";
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { submitMatchResults } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
-import { formSchema } from "@/lib/schemas";
+import { playerStatsOnlySchema } from "@/lib/schemas";
 import type { UpcomingMatch } from "@/lib/types";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
@@ -29,12 +29,10 @@ interface EnterResultsFormProps {
 }
 
 // We only need the stats from the form, player names are fixed.
-const statsOnlySchema = formSchema.omit({ 
-    player1: true, 
-    player2: true 
-}).extend({
-    player1: formSchema.shape.player1.omit({ name: true }),
-    player2: formSchema.shape.player2.omit({ name: true }),
+const statsOnlySchema = z.object({
+    player1: playerStatsOnlySchema,
+    player2: playerStatsOnlySchema,
+    winner: z.enum(['player1', 'player2'], { required_error: "You must select a winner." }),
 });
 
 
