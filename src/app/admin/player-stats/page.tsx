@@ -68,10 +68,10 @@ async function getPlayerStats(): Promise<PlayerStatsSummary[]> {
             p2Stats.totalPowerUpHits += player2.powerUpHits;
         }
 
-        if (player1.totalPoints > player2.totalPoints) {
+        if (player1.finishingPosition === 1) {
             if (p1Stats) p1Stats.wins += 1;
             if (p2Stats) p2Stats.losses += 1;
-        } else if (player2.totalPoints > player1.totalPoints) {
+        } else if (player2.finishingPosition === 1) {
             if (p2Stats) p2Stats.wins += 1;
             if (p1Stats) p1Stats.losses += 1;
         }

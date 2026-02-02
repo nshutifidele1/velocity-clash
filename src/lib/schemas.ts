@@ -2,7 +2,6 @@ import { z } from "zod";
 
 const playerStatsSchema = z.object({
   name: z.string().min(1, "Player name is required."),
-  finishingPosition: z.coerce.number().int().min(1, "Position must be 1 or greater."),
   totalPoints: z.coerce.number().int().min(0, "Points cannot be negative."),
   powerUpHits: z.coerce.number().int().min(0, "Hits cannot be negative."),
   lapTime: z.preprocess(
@@ -18,6 +17,7 @@ const playerStatsSchema = z.object({
 export const formSchema = z.object({
   player1: playerStatsSchema,
   player2: playerStatsSchema,
+  winner: z.enum(['player1', 'player2'], { required_error: "You must select a winner." }),
 }).refine(data => {
     if (!data.player1.name || !data.player2.name) return true;
     return data.player1.name !== data.player2.name;

@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formSchema } from "@/lib/schemas";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import type { UserProfile } from "@/lib/types";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 interface DirectMatchFormProps {
     players: UserProfile[];
@@ -36,7 +37,6 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
     defaultValues: {
       player1: {
         name: "",
-        finishingPosition: 1,
         totalPoints: 0,
         powerUpHits: 0,
         lapTime: '',
@@ -44,7 +44,6 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
       },
       player2: {
         name: "",
-        finishingPosition: 2,
         totalPoints: 0,
         powerUpHits: 0,
         lapTime: '',
@@ -71,6 +70,9 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
       // Redirect is handled by the server action
     });
   }
+
+  const player1Name = form.watch("player1.name");
+  const player2Name = form.watch("player2.name");
 
   const renderPlayerFields = (player: "player1" | "player2", title: string) => (
     <Card className="w-full bg-transparent border-secondary">
@@ -102,21 +104,7 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name={`${player}.finishingPosition`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Position</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
+        <FormField
             control={form.control}
             name={`${player}.totalPoints`}
             render={({ field }) => (
@@ -129,7 +117,6 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
               </FormItem>
             )}
           />
-        </div>
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -182,6 +169,38 @@ export function DirectMatchForm({ players }: DirectMatchFormProps) {
           {renderPlayerFields("player1", "Player 1")}
           {renderPlayerFields("player2", "Player 2")}
         </div>
+        
+        <FormField
+          control={form.control}
+          name="winner"
+          render={({ field }) => (
+            <FormItem className="space-y-3 p-4 border rounded-lg">
+              <FormLabel className="text-base">Select Winner</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="player1" disabled={!player1Name} />
+                    </FormControl>
+                    <FormLabel className="font-normal">{player1Name || "Player 1"}</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="player2" disabled={!player2Name} />
+                    </FormControl>
+                    <FormLabel className="font-normal">{player2Name || "Player 2"}</FormLabel>
+                  </FormItem>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button
           type="submit"
           disabled={isPending}

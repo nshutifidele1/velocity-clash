@@ -86,7 +86,7 @@ export default async function AdminMatchesPage() {
                                     <div className="font-medium">{match.player1.name}</div>
                                     <div className="text-sm text-muted-foreground">vs {match.player2.name}</div>
                                 </TableCell>
-                                <TableCell>{match.player1.totalPoints > match.player2.totalPoints ? match.player1.name : match.player2.name}</TableCell>
+                                <TableCell>{match.player1.finishingPosition === 1 ? match.player1.name : match.player2.name}</TableCell>
                                 <TableCell className="max-w-xs truncate">{match.commentary}</TableCell>
                                 <TableCell className="hidden md:table-cell">{new Date(match.timestamp).toLocaleDateString()}</TableCell>
                                 <TableCell>

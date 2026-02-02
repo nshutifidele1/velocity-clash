@@ -1,5 +1,6 @@
 "use server";
 
+import "dotenv/config";
 import { z } from "zod";
 import { assignPerformanceTitles } from "@/ai/flows/assign-performance-titles";
 import { db } from "@/lib/firebase";
@@ -12,6 +13,9 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
   try {
     const validatedData = formSchema.parse(values);
 
+    const p1FinishingPosition = validatedData.winner === 'player1' ? 1 : 2;
+    const p2FinishingPosition = validatedData.winner === 'player2' ? 1 : 2;
+
     const p1LapTimeNum = validatedData.player1.lapTime;
     const p2LapTimeNum = validatedData.player2.lapTime;
 
@@ -21,13 +25,13 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
 
     const aiInput = {
       player1Name: validatedData.player1.name,
-      player1FinishingPosition: validatedData.player1.finishingPosition,
+      player1FinishingPosition: p1FinishingPosition,
       player1TotalPoints: validatedData.player1.totalPoints,
       player1PowerUpHits: validatedData.player1.powerUpHits,
       player1LapTime: p1LapTimeNum,
       player1SpeedRank: p1LapTimeNum ? undefined : Math.floor(Math.random() * 10) + 1,
       player2Name: validatedData.player2.name,
-      player2FinishingPosition: validatedData.player2.finishingPosition,
+      player2FinishingPosition: p2FinishingPosition,
       player2TotalPoints: validatedData.player2.totalPoints,
       player2PowerUpHits: validatedData.player2.powerUpHits,
       player2LapTime: p2LapTimeNum,
@@ -44,7 +48,7 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
     const matchData = {
       player1: {
         name: validatedData.player1.name,
-        finishingPosition: validatedData.player1.finishingPosition,
+        finishingPosition: p1FinishingPosition,
         totalPoints: validatedData.player1.totalPoints,
         powerUpHits: validatedData.player1.powerUpHits,
         lapTime: p1LapTimeNum ?? 0,
@@ -53,7 +57,7 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
       },
       player2: {
         name: validatedData.player2.name,
-        finishingPosition: validatedData.player2.finishingPosition,
+        finishingPosition: p2FinishingPosition,
         totalPoints: validatedData.player2.totalPoints,
         powerUpHits: validatedData.player2.powerUpHits,
         lapTime: p2LapTimeNum ?? 0,

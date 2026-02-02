@@ -22,6 +22,7 @@ import { submitMatchResults } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { formSchema } from "@/lib/schemas";
 import type { UpcomingMatch } from "@/lib/types";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 interface EnterResultsFormProps {
   upcomingMatch: UpcomingMatch;
@@ -45,14 +46,12 @@ export function EnterResultsForm({ upcomingMatch }: EnterResultsFormProps) {
     resolver: zodResolver(statsOnlySchema),
     defaultValues: {
       player1: {
-        finishingPosition: 1,
         totalPoints: 0,
         powerUpHits: 0,
         lapTime: '',
         fansGained: '',
       },
       player2: {
-        finishingPosition: 2,
         totalPoints: 0,
         powerUpHits: 0,
         lapTime: '',
@@ -65,6 +64,7 @@ export function EnterResultsForm({ upcomingMatch }: EnterResultsFormProps) {
     const fullValues = {
         player1: { ...values.player1, name: upcomingMatch.player1Name },
         player2: { ...values.player2, name: upcomingMatch.player2Name },
+        winner: values.winner,
     };
 
     startTransition(async () => {
@@ -86,21 +86,7 @@ export function EnterResultsForm({ upcomingMatch }: EnterResultsFormProps) {
         <CardTitle className="font-headline text-accent text-glow-accent">{playerName}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name={`${player}.finishingPosition`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Position</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
+        <FormField
             control={form.control}
             name={`${player}.totalPoints`}
             render={({ field }) => (
@@ -113,7 +99,6 @@ export function EnterResultsForm({ upcomingMatch }: EnterResultsFormProps) {
               </FormItem>
             )}
           />
-        </div>
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -166,6 +151,38 @@ export function EnterResultsForm({ upcomingMatch }: EnterResultsFormProps) {
           {renderPlayerFields("player1", upcomingMatch.player1Name)}
           {renderPlayerFields("player2", upcomingMatch.player2Name)}
         </div>
+        
+        <FormField
+          control={form.control}
+          name="winner"
+          render={({ field }) => (
+            <FormItem className="space-y-3 p-4 border rounded-lg">
+              <FormLabel className="text-base">Select Winner</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="player1" />
+                    </FormControl>
+                    <FormLabel className="font-normal">{upcomingMatch.player1Name}</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="player2" />
+                    </FormControl>
+                    <FormLabel className="font-normal">{upcomingMatch.player2Name}</FormLabel>
+                  </FormItem>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button
           type="submit"
           disabled={isPending}
