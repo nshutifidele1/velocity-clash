@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Calendar, Swords } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
+import { TournamentChampionCard } from "@/components/tournament-champion-card";
 
 async function getMatches(): Promise<MatchResult[]> {
   try {
@@ -134,6 +135,8 @@ export default async function MatchesPage() {
         <main className="container mx-auto px-4 py-8">
              <h1 className="font-headline text-4xl mb-12 text-center">Matches</h1>
             
+             <TournamentChampionCard storageKey="leagues-tournament" title="League" />
+
              <UpcomingMatchesSection upcoming={upcoming} users={users} />
 
              <div className="flex items-center gap-3 mb-6 mt-12">
