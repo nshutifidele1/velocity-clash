@@ -68,3 +68,10 @@ export interface BracketRound {
   title: string;
   matchups: BracketMatchup[];
 }
+
+export interface UpcomingMatch {
+  id: string;
+  player1Name: string;
+  player2Name: string;
+  time: Date;
+}

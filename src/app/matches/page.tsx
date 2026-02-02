@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import type { MatchResult } from "@/lib/types";
+import type { MatchResult, UpcomingMatch } from "@/lib/types";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { VersusMatchCard } from "@/components/versus-match-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -27,24 +27,25 @@ async function getMatches(): Promise<MatchResult[]> {
   }
 }
 
-const UpcomingMatches = () => {
-    const upcoming = [
-        {
-            player1: "VelocityViper",
-            player2: "NitroNeptune",
-            time: "Today, 8:00 PM"
-        },
-        {
-            player1: "EchoRacer",
-            player2: "PhotonPhaser",
-            time: "Tomorrow, 6:00 PM"
-        },
-        {
-            player1: "CyberStallion",
-            player2: "WarpDrifter",
-            time: "Tomorrow, 9:00 PM"
-        }
-    ];
+async function getUpcomingMatches(): Promise<UpcomingMatch[]> {
+    try {
+      const upcomingMatchesCol = collection(db, "upcomingMatches");
+      const q = query(upcomingMatchesCol, orderBy("time", "asc"));
+      const snapshot = await getDocs(q);
+      const list = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          time: doc.data().time.toDate(),
+      } as UpcomingMatch));
+      return list;
+    } catch (error) {
+        console.error("Error fetching upcoming matches: ", error);
+        return [];
+    }
+  }
+  
+const UpcomingMatches = async () => {
+    const upcoming = await getUpcomingMatches();
 
     return (
         <Card className="max-w-2xl w-full bg-card/50 border-primary/40 p-8 rounded-2xl shadow-2xl shadow-primary/20 box-glow-primary transition-all hover:shadow-primary/30">
@@ -60,16 +61,20 @@ const UpcomingMatches = () => {
                 </CardDescription>
             </CardHeader>
             <CardContent className="p-0 mt-8 space-y-4">
-                {upcoming.map((match, index) => (
-                    <div key={index} className="text-left p-4 rounded-lg bg-background/50 border flex justify-between items-center">
+                {upcoming.length > 0 ? upcoming.map((match) => (
+                    <div key={match.id} className="text-left p-4 rounded-lg bg-background/50 border flex justify-between items-center">
                         <div>
                             <p className="font-headline text-lg">
-                                {match.player1} vs {match.player2}
+                                {match.player1Name} vs {match.player2Name}
                             </p>
                         </div>
-                        <p className="text-muted-foreground text-sm font-mono">{match.time}</p>
+                        <p className="text-muted-foreground text-sm font-mono">{new Date(match.time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</p>
                     </div>
-                ))}
+                )) : (
+                    <div className="text-center text-muted-foreground py-8">
+                        <p>No upcoming matches scheduled.</p>
+                    </div>
+                )}
             </CardContent>
             <CardFooter className="p-0 mt-8 justify-center">
                 <Button asChild size="lg" className="font-headline text-lg">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Swords, Users, Settings, Trophy, Shapes, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Swords, Users, Settings, Trophy, Shapes, ClipboardList, Calendar } from "lucide-react";
 
 const links = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -11,6 +11,7 @@ const links = [
     { href: "/admin/users", label: "Players", icon: Users },
     { href: "/admin/player-stats", label: "Player Stats", icon: ClipboardList },
     { href: "/admin/leagues", label: "Leagues", icon: Shapes },
+    { href: "/admin/upcoming-matches", label: "Upcoming Matches", icon: Calendar },
     { href: "/admin/trophies", label: "Trophies", icon: Trophy },
 ];
 

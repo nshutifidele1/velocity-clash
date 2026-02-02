@@ -3,9 +3,9 @@
 import { z } from "zod";
 import { assignPerformanceTitles } from "@/ai/flows/assign-performance-titles";
 import { db } from "@/lib/firebase";
-import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc } from "firebase/firestore";
+import { doc, runTransaction, serverTimestamp, collection, addDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { redirect } from "next/navigation";
-import { formSchema } from "@/lib/schemas";
+import { formSchema, upcomingMatchSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 
 export async function submitMatchResults(values: z.infer<typeof formSchema>) {
@@ -85,6 +85,47 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
     if (error instanceof z.ZodError) {
         return { error: "Validation failed", details: error.flatten() };
     }
+    return { error: "An unexpected error occurred on the server." };
+  }
+}
+
+export async function addUpcomingMatch(values: z.infer<typeof upcomingMatchSchema>) {
+  try {
+    const validatedData = upcomingMatchSchema.parse(values);
+
+    await addDoc(collection(db, "upcomingMatches"), {
+      player1Name: validatedData.player1Name,
+      player2Name: validatedData.player2Name,
+      time: validatedData.time,
+    });
+
+    revalidatePath("/matches");
+    revalidatePath("/admin/upcoming-matches");
+
+    return { success: "Upcoming match added!" };
+
+  } catch (error) {
+    console.error("Error adding upcoming match:", error);
+    if (error instanceof z.ZodError) {
+        return { error: "Validation failed", details: error.flatten() };
+    }
+    return { error: "An unexpected error occurred on the server." };
+  }
+}
+
+export async function deleteUpcomingMatch(id: string) {
+  try {
+    if (!id) {
+        return { error: "Match ID is required." };
+    }
+    await deleteDoc(doc(db, "upcomingMatches", id));
+    
+    revalidatePath("/matches");
+    revalidatePath("/admin/upcoming-matches");
+    
+    return { success: "Upcoming match deleted!" };
+  } catch (error) {
+    console.error("Error deleting upcoming match:", error);
     return { error: "An unexpected error occurred on the server." };
   }
 }

@@ -31,3 +31,9 @@ export const loginSchema = z.object({
     email: z.string().email({ message: "Invalid email address." }),
     password: z.string().min(1, { message: "Password is required." }),
 });
+
+export const upcomingMatchSchema = z.object({
+  player1Name: z.string().min(1, "Player 1 name is required."),
+  player2Name: z.string().min(1, "Player 2 name is required."),
+  time: z.date({ required_error: "Match time is required." }),
+});
