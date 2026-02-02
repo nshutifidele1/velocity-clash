@@ -297,3 +297,64 @@ export async function deleteTournamentBracket(storageKey: string) {
         return { error: "An unexpected error occurred while resetting the bracket." };
     }
 }
+
+
+export async function deleteMatch(id: string) {
+  try {
+    if (!id) {
+        return { error: "Match ID is required." };
+    }
+    
+    const matchRef = doc(db, "matches", id);
+    
+    await runTransaction(db, async (transaction) => {
+        const matchDoc = await transaction.get(matchRef);
+        if (!matchDoc.exists()) {
+            throw new Error("Match not found.");
+        }
+
+        const matchData = matchDoc.data();
+        
+        // Player 1 update
+        const p1Data = matchData.player1;
+        if (p1Data && p1Data.name) {
+            const player1Ref = doc(db, "leaderboard", p1Data.name.toLowerCase());
+            const player1Doc = await transaction.get(player1Ref);
+            if (player1Doc.exists()) {
+                const newPoints = player1Doc.data().totalPoints - p1Data.totalPoints;
+                const newMatches = Math.max(0, player1Doc.data().matchesPlayed - 1);
+                transaction.update(player1Ref, { totalPoints: newPoints, matchesPlayed: newMatches });
+            }
+        }
+        
+        // Player 2 update
+        const p2Data = matchData.player2;
+        if (p2Data && p2Data.name) {
+            const player2Ref = doc(db, "leaderboard", p2Data.name.toLowerCase());
+            const player2Doc = await transaction.get(player2Ref);
+            if (player2Doc.exists()) {
+                const newPoints = player2Doc.data().totalPoints - p2Data.totalPoints;
+                const newMatches = Math.max(0, player2Doc.data().matchesPlayed - 1);
+                transaction.update(player2Ref, { totalPoints: newPoints, matchesPlayed: newMatches });
+            }
+        }
+        
+        // Delete match
+        transaction.delete(matchRef);
+    });
+
+    revalidatePath("/admin/matches");
+    revalidatePath("/matches");
+    revalidatePath("/leaderboard-page");
+    revalidatePath("/admin/player-stats");
+
+    return { success: "Match deleted successfully!" };
+
+  } catch (error) {
+    console.error("Error deleting match:", error);
+    if (error instanceof Error) {
+        return { error: error.message };
+    }
+    return { error: "An unexpected error occurred on the server." };
+  }
+}

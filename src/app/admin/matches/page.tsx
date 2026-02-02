@@ -18,14 +18,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, PlusCircle } from "lucide-react";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { PlusCircle } from "lucide-react";
+import { MatchActions } from "@/components/match-actions";
 
 async function getMatches(): Promise<MatchResult[]> {
   try {
@@ -90,24 +84,7 @@ export default async function AdminMatchesPage() {
                                 <TableCell className="max-w-xs truncate">{match.commentary}</TableCell>
                                 <TableCell className="hidden md:table-cell">{new Date(match.timestamp).toLocaleDateString()}</TableCell>
                                 <TableCell>
-                                     <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-haspopup="true"
-                                            size="icon"
-                                            variant="ghost"
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">Toggle menu</span>
-                                        </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem asChild><Link href={`/results?id=${match.id}`}>View</Link></DropdownMenuItem>
-                                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                     <MatchActions matchId={match.id} />
                                 </TableCell>
                             </TableRow>
                         ))}
