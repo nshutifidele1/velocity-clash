@@ -68,8 +68,8 @@ export default function Home() {
                 </Card>
             </div>
             <Button asChild size="lg" className="font-headline text-xl">
-              <Link href="/add-result">
-                Start a Match <ArrowRight className="ml-2 h-5 w-5" />
+              <Link href="/matches">
+                View Matches <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </section>

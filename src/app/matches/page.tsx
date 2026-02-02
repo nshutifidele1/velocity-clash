@@ -3,9 +3,7 @@ import type { MatchResult, UpcomingMatch } from "@/lib/types";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { VersusMatchCard } from "@/components/versus-match-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ArrowRight, Calendar, Swords } from "lucide-react";
+import { Calendar, Swords } from "lucide-react";
 
 async function getMatches(): Promise<MatchResult[]> {
   try {
@@ -103,13 +101,11 @@ export default async function MatchesPage() {
              ) : (
                 <Card className="text-center text-muted-foreground py-16 bg-card/50">
                     <CardContent className="p-0">
-                        <p className="text-lg mb-4">No match results have been recorded yet.</p>
-                        <Button asChild>
-                            <Link href="/add-result">
-                                Submit First Result
-                                <ArrowRight className="ml-2 h-5 w-5" />
-                            </Link>
-                        </Button>
+                        <div className="flex flex-col items-center gap-4">
+                            <Swords className="h-12 w-12 text-muted-foreground/50" />
+                            <p className="text-lg">No match results have been recorded yet.</p>
+                            <p className="text-sm">Completed matches will appear here once results are submitted.</p>
+                        </div>
                     </CardContent>
                 </Card>
              )}

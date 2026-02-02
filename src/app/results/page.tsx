@@ -43,8 +43,8 @@ async function ResultsDisplay({ id }: { id: string }) {
       <div className="text-center">
         <p className="text-destructive text-lg">No match data found, or an error occurred.</p>
         <Button asChild className="mt-4">
-          <Link href="/">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+          <Link href="/matches">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Matches
           </Link>
         </Button>
       </div>
@@ -56,8 +56,8 @@ async function ResultsDisplay({ id }: { id: string }) {
       <MatchCard match={results} />
       <div className="text-center">
         <Button asChild size="lg" className="font-headline text-lg bg-accent text-accent-foreground hover:bg-accent/90 rounded-md box-glow-accent transition-all">
-          <Link href="/add-result">
-            <ArrowLeft className="mr-2 h-5 w-5" /> Play Again
+          <Link href="/matches">
+            <ArrowLeft className="mr-2 h-5 w-5" /> Back to Matches
           </Link>
         </Button>
       </div>
