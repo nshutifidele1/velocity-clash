@@ -12,6 +12,7 @@ async function getPlayers(): Promise<UserProfile[]> {
     const usersList = usersSnapshot.docs.map(doc => {
         const data = doc.data();
         return {
+            uid: doc.id,
             gamingName: data.gamingName,
             experience: data.experience,
             gender: data.gender,

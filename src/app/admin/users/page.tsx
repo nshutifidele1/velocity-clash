@@ -18,22 +18,24 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { getInitials } from "@/lib/utils";
+import { UserActions } from "@/components/user-actions";
 
 async function getUsers(): Promise<UserProfile[]> {
   try {
     const usersCol = collection(db, "users");
     const usersSnapshot = await getDocs(usersCol);
-    const usersList = usersSnapshot.docs.map(doc => doc.data() as UserProfile);
+    const usersList = usersSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            uid: doc.id,
+            gamingName: data.gamingName,
+            experience: data.experience,
+            gender: data.gender,
+            photoUrl: data.photoUrl,
+            email: data.email,
+        } as UserProfile;
+    });
     return usersList;
   } catch (error) {
     console.error("Error fetching users: ", error);
@@ -65,7 +67,7 @@ export default async function AdminPlayersPage() {
                     </TableHeader>
                     <TableBody>
                         {users.map(user => (
-                            <TableRow key={user.email}>
+                            <TableRow key={user.uid}>
                                 <TableCell>
                                     <div className="flex items-center gap-3">
                                         <Avatar>
@@ -81,23 +83,7 @@ export default async function AdminPlayersPage() {
                                 <TableCell className="hidden md:table-cell">{user.gender}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>
-                                     <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-haspopup="true"
-                                            size="icon"
-                                            variant="ghost"
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">Toggle menu</span>
-                                        </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                     <UserActions user={user} />
                                 </TableCell>
                             </TableRow>
                         ))}

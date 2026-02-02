@@ -28,6 +28,7 @@ export interface LeaderboardEntry {
 }
 
 export interface UserProfile {
+  uid: string;
   gamingName: string;
   experience: 'Beginner' | 'Intermediate' | 'Pro';
   gender: 'Male' | 'Female' | 'Other' | 'Prefer not to say';

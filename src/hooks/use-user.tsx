@@ -25,7 +25,15 @@ export function useUser(): UseUserReturn {
             const userRef = doc(db, 'users', userAuth.uid);
             const userSnap = await getDoc(userRef);
             if (userSnap.exists()) {
-              setProfile(userSnap.data() as UserProfile);
+              const data = userSnap.data();
+              setProfile({
+                uid: userAuth.uid,
+                gamingName: data.gamingName,
+                experience: data.experience,
+                gender: data.gender,
+                photoUrl: data.photoUrl,
+                email: data.email,
+              });
             } else {
               setProfile(null);
             }

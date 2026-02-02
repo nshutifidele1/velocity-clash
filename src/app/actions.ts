@@ -305,10 +305,9 @@ export async function deleteMatch(id: string) {
         return { error: "Match ID is required." };
     }
     
-    const matchRef = doc(db, "matches", id);
-    
     await runTransaction(db, async (transaction) => {
         // --- READ PHASE ---
+        const matchRef = doc(db, "matches", id);
         const matchDoc = await transaction.get(matchRef);
         if (!matchDoc.exists()) {
             throw new Error("Match not found.");
@@ -360,4 +359,42 @@ export async function deleteMatch(id: string) {
     }
     return { error: "An unexpected error occurred on the server." };
   }
+}
+
+export async function deleteUser(uid: string) {
+    try {
+        if (!uid) {
+            return { error: "User ID is required." };
+        }
+
+        await runTransaction(db, async (transaction) => {
+            const userRef = doc(db, "users", uid);
+            const userDoc = await transaction.get(userRef);
+
+            let gamingName: string | undefined;
+            if (userDoc.exists()) {
+                gamingName = userDoc.data().gamingName;
+                transaction.delete(userRef);
+            }
+
+            if (gamingName) {
+                const leaderboardRef = doc(db, "leaderboard", gamingName.toLowerCase());
+                transaction.delete(leaderboardRef);
+            }
+        });
+        
+        revalidatePath("/admin/users");
+        revalidatePath("/leaderboard-page");
+        revalidatePath("/admin/player-stats");
+        revalidatePath("/matches");
+
+        return { success: "User data deleted successfully!" };
+
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        if (error instanceof Error) {
+            return { error: error.message };
+        }
+        return { error: "An unexpected error occurred while deleting the user." };
+    }
 }
