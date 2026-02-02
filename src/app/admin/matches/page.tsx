@@ -59,7 +59,7 @@ export default async function AdminMatchesPage() {
                         <CardDescription>Manage all submitted match results.</CardDescription>
                     </div>
                     <Button asChild>
-                        <Link href="/admin/matches/new">
+                        <Link href="/admin/upcoming-matches">
                             <PlusCircle className="mr-2 h-4 w-4" />
                             New Match
                         </Link>

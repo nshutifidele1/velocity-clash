@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { formSchema, upcomingMatchSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 
-export async function submitMatchResults(values: z.infer<typeof formSchema>) {
+export async function submitMatchResults(values: z.infer<typeof formSchema>, upcomingMatchId?: string) {
   try {
     const validatedData = formSchema.parse(values);
 
@@ -72,11 +72,20 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>) {
       }
 
       transaction.set(matchRef, matchData);
+      
+      if (upcomingMatchId) {
+        const upcomingMatchRef = doc(db, "upcomingMatches", upcomingMatchId);
+        transaction.delete(upcomingMatchRef);
+      }
     });
 
     revalidatePath("/admin/matches");
     revalidatePath("/matches");
     revalidatePath("/leaderboard-page");
+    
+    if (upcomingMatchId) {
+        revalidatePath("/admin/upcoming-matches");
+    }
 
     redirect(`/results?id=${matchRef.id}`);
 

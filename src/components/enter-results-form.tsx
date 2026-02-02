@@ -16,33 +16,35 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { submitMatchResults } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { formSchema } from "@/lib/schemas";
-import type { UserProfile } from "@/lib/types";
+import type { UpcomingMatch } from "@/lib/types";
 
-interface ManualMatchFormProps {
-  users: UserProfile[];
+interface EnterResultsFormProps {
+  upcomingMatch: UpcomingMatch;
 }
 
-export function ManualMatchForm({ users }: ManualMatchFormProps) {
+// We only need the stats from the form, player names are fixed.
+const statsOnlySchema = formSchema.omit({ 
+    player1: true, 
+    player2: true 
+}).extend({
+    player1: formSchema.shape.player1.omit({ name: true }),
+    player2: formSchema.shape.player2.omit({ name: true }),
+});
+
+
+export function EnterResultsForm({ upcomingMatch }: EnterResultsFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof statsOnlySchema>>({
+    resolver: zodResolver(statsOnlySchema),
     defaultValues: {
       player1: {
-        name: "",
         finishingPosition: 1,
         totalPoints: 0,
         powerUpHits: 0,
@@ -50,7 +52,6 @@ export function ManualMatchForm({ users }: ManualMatchFormProps) {
         fansGained: '',
       },
       player2: {
-        name: "",
         finishingPosition: 2,
         totalPoints: 0,
         powerUpHits: 0,
@@ -60,63 +61,31 @@ export function ManualMatchForm({ users }: ManualMatchFormProps) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (values.player1.name === values.player2.name) {
-        toast({
-            variant: "destructive",
-            title: "Submission Error",
-            description: "Players cannot be the same.",
-        });
-        return;
-    }
+  function onSubmit(values: z.infer<typeof statsOnlySchema>) {
+    const fullValues = {
+        player1: { ...values.player1, name: upcomingMatch.player1Name },
+        player2: { ...values.player2, name: upcomingMatch.player2Name },
+    };
+
     startTransition(async () => {
-      const result = await submitMatchResults(values);
+      const result = await submitMatchResults(fullValues, upcomingMatch.id);
       if (result?.error) {
         toast({
             variant: "destructive",
             title: "Submission Error",
             description: result.error,
         });
-      } else {
-         toast({
-            title: "Match Created!",
-            description: "The manual match has been successfully submitted.",
-        });
-        form.reset();
       }
+      // Redirect is handled by the server action
     });
   }
 
-  const renderPlayerFields = (player: "player1" | "player2", title: string) => (
+  const renderPlayerFields = (player: "player1" | "player2", playerName: string) => (
     <Card className="w-full bg-transparent border-secondary">
       <CardHeader>
-        <CardTitle className="font-headline text-accent text-glow-accent">{title}</CardTitle>
+        <CardTitle className="font-headline text-accent text-glow-accent">{playerName}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <FormField
-          control={form.control}
-          name={`${player}.name`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Player Name</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select a player" />
-                        </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                        {users.map(user => (
-                            <SelectItem key={user.email} value={user.gamingName}>
-                                {user.gamingName}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -194,15 +163,15 @@ export function ManualMatchForm({ users }: ManualMatchFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid md:grid-cols-2 gap-8">
-          {renderPlayerFields("player1", "Player 1")}
-          {renderPlayerFields("player2", "Player 2")}
+          {renderPlayerFields("player1", upcomingMatch.player1Name)}
+          {renderPlayerFields("player2", upcomingMatch.player2Name)}
         </div>
         <Button
           type="submit"
           disabled={isPending}
           className="w-full font-headline text-lg py-6 bg-accent text-accent-foreground hover:bg-accent/90 rounded-md box-glow-accent transition-all"
         >
-          {isPending ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : "Submit Match"}
+          {isPending ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : "Submit Final Results"}
         </Button>
       </form>
     </Form>
