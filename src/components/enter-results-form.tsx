@@ -116,7 +116,7 @@ export function EnterResultsForm({ upcomingMatch }: EnterResultsFormProps) {
             name={`${player}.lapTime`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Lap Time (sec)</FormLabel>
+                <FormLabel>Lap Time</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="Optional" {...field} />
                 </FormControl>

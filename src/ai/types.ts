@@ -6,13 +6,13 @@ export const AssignPerformanceTitlesInputSchema = z.object({
   player1FinishingPosition: z.number().describe('Finishing position of player 1'),
   player1TotalPoints: z.number().describe('Total points of player 1'),
   player1PowerUpHits: z.number().describe('Number of power-up hits by player 1'),
-  player1LapTime: z.number().optional().describe('Best lap time of player 1 in seconds'),
+  player1LapTime: z.number().optional().describe('Best lap time of player 1'),
   player1SpeedRank: z.number().optional().describe('Speed rank of player 1 if lap time is unavailable'),
   player2Name: z.string().describe('Name of player 2'),
   player2FinishingPosition: z.number().describe('Finishing position of player 2'),
   player2TotalPoints: z.number().describe('Total points of player 2'),
   player2PowerUpHits: z.number().describe('Number of power-up hits by player 2'),
-  player2LapTime: z.number().optional().describe('Best lap time of player 2 in seconds'),
+  player2LapTime: z.number().optional().describe('Best lap time of player 2'),
   player2SpeedRank: z.number().optional().describe('Speed rank of player 2 if lap time is unavailable'),
 });
 export type AssignPerformanceTitlesInput = z.infer<typeof AssignPerformanceTitlesInputSchema>;
@@ -31,7 +31,7 @@ export const SummarizePlayerPerformanceInputSchema = z.object({
     finishingPosition: z.number().describe("Player's finishing position"),
     totalPoints: z.number().describe("Player's total points in the match"),
     powerUpHits: z.number().describe("Number of power-ups hit by the player"),
-    lapTime: z.number().optional().describe("Player's best lap time in seconds"),
+    lapTime: z.number().optional().describe("Player's best lap time"),
     speedRank: z.number().optional().describe("Player's speed rank if lap time is unavailable"),
 });
 export type SummarizePlayerPerformanceInput = z.infer<typeof SummarizePlayerPerformanceInputSchema>;

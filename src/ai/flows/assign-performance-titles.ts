@@ -15,6 +15,15 @@ import {
 } from '@/ai/types';
 
 export async function assignPerformanceTitles(input: AssignPerformanceTitlesInput): Promise<AssignPerformanceTitlesOutput> {
+  if (!process.env.GEMINI_API_KEY) {
+    console.error("GEMINI_API_KEY is not set. Please add it to your .env file.");
+    // Return a deterministic response or throw an error
+    return {
+      player1Title: 'Title Pending',
+      player2Title: 'Title Pending',
+      commentary: 'AI commentary is currently unavailable. Please configure the API key.'
+    };
+  }
   return assignPerformanceTitlesFlow(input);
 }
 
@@ -33,7 +42,7 @@ Finishing Position: {{player1FinishingPosition}}
 Total Points: {{player1TotalPoints}}
 Power-Up Hits: {{player1PowerUpHits}}
 {{#if player1LapTime}}
-Lap Time: {{player1LapTime}} seconds
+Lap Time: {{player1LapTime}}
 {{/if}}
 
 Player 2: {{player2Name}}
@@ -41,7 +50,7 @@ Finishing Position: {{player2FinishingPosition}}
 Total Points: {{player2TotalPoints}}
 Power-Up Hits: {{player2PowerUpHits}}
 {{#if player2LapTime}}
-Lap Time: {{player2LapTime}} seconds
+Lap Time: {{player2LapTime}}
 {{/if}}
 
 Consider the following titles when assigning them:

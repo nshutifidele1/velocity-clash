@@ -27,7 +27,7 @@ const PlayerCard = ({ player }: { player: PlayerResult }) => (
             </div>
             <div className="flex flex-col items-center gap-1 p-2 bg-background/50 rounded-md">
                 <Zap className="w-6 h-6 text-muted-foreground"/>
-                <span className="font-bold">{player.lapTime > 0 ? `${player.lapTime}s` : 'N/A'}</span>
+                <span className="font-bold">{player.lapTime > 0 ? player.lapTime : 'N/A'}</span>
                 <span className="text-sm text-muted-foreground">Lap Time</span>
             </div>
         </div>

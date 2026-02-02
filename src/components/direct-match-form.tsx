@@ -143,7 +143,7 @@ export function DirectMatchForm({ players, p1name, p2name, tournamentParams }: D
             name={`${player}.lapTime`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Lap Time (sec)</FormLabel>
+                <FormLabel>Lap Time</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="Optional" {...field} />
                 </FormControl>
