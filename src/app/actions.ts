@@ -12,17 +12,24 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
   try {
     const validatedData = formSchema.parse(values);
 
+    const p1LapTimeNum = validatedData.player1.lapTime ? Number(validatedData.player1.lapTime) : undefined;
+    const p2LapTimeNum = validatedData.player2.lapTime ? Number(validatedData.player2.lapTime) : undefined;
+
+    const p1FansGainedNum = validatedData.player1.fansGained ? Number(validatedData.player1.fansGained) : 0;
+    const p2FansGainedNum = validatedData.player2.fansGained ? Number(validatedData.player2.fansGained) : 0;
+
+
     const aiInput = {
       player1Name: validatedData.player1.name,
       player1FinishingPosition: validatedData.player1.finishingPosition,
       player1TotalPoints: validatedData.player1.totalPoints,
       player1PowerUpHits: validatedData.player1.powerUpHits,
-      player1LapTime: validatedData.player1.lapTime !== '' ? Number(validatedData.player1.lapTime) : undefined,
+      player1LapTime: p1LapTimeNum,
       player2Name: validatedData.player2.name,
       player2FinishingPosition: validatedData.player2.finishingPosition,
       player2TotalPoints: validatedData.player2.totalPoints,
       player2PowerUpHits: validatedData.player2.powerUpHits,
-      player2LapTime: validatedData.player2.lapTime !== '' ? Number(validatedData.player2.lapTime) : undefined,
+      player2LapTime: p2LapTimeNum,
     };
 
     const aiResult = await assignPerformanceTitles(aiInput);
@@ -34,15 +41,21 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
 
     const matchData = {
       player1: {
-        ...validatedData.player1,
-        lapTime: Number(validatedData.player1.lapTime) || 0,
-        fansGained: Number(validatedData.player1.fansGained) || 0,
+        name: validatedData.player1.name,
+        finishingPosition: validatedData.player1.finishingPosition,
+        totalPoints: validatedData.player1.totalPoints,
+        powerUpHits: validatedData.player1.powerUpHits,
+        lapTime: p1LapTimeNum || 0,
+        fansGained: p1FansGainedNum,
         title: aiResult.player1Title,
       },
       player2: {
-        ...validatedData.player2,
-        lapTime: Number(validatedData.player2.lapTime) || 0,
-        fansGained: Number(validatedData.player2.fansGained) || 0,
+        name: validatedData.player2.name,
+        finishingPosition: validatedData.player2.finishingPosition,
+        totalPoints: validatedData.player2.totalPoints,
+        powerUpHits: validatedData.player2.powerUpHits,
+        lapTime: p2LapTimeNum || 0,
+        fansGained: p2FansGainedNum,
         title: aiResult.player2Title,
       },
       commentary: aiResult.commentary,

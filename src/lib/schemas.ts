@@ -2,17 +2,20 @@ import { z } from "zod";
 
 const playerStatsSchema = z.object({
   name: z.string().min(1, "Player name is required."),
-  finishingPosition: z.coerce.number().int().min(1),
-  totalPoints: z.coerce.number().int().min(0),
-  powerUpHits: z.coerce.number().int().min(0),
-  lapTime: z.coerce.number().min(0).optional().or(z.literal('')),
-  fansGained: z.coerce.number().int().min(0).optional().or(z.literal('')),
+  finishingPosition: z.coerce.number().int().min(1, "Position must be 1 or greater."),
+  totalPoints: z.coerce.number().int().min(0, "Points cannot be negative."),
+  powerUpHits: z.coerce.number().int().min(0, "Hits cannot be negative."),
+  lapTime: z.string().optional(),
+  fansGained: z.string().optional(),
 });
 
 export const formSchema = z.object({
   player1: playerStatsSchema,
   player2: playerStatsSchema,
-}).refine(data => data.player1.name !== data.player2.name, {
+}).refine(data => {
+    if (!data.player1.name || !data.player2.name) return true;
+    return data.player1.name !== data.player2.name;
+}, {
     message: "Players cannot be the same person.",
     path: ["player2", "name"],
 });
