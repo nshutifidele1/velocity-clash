@@ -89,8 +89,14 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
     };
 
     await runTransaction(db, async (transaction) => {
+      // --- READ PHASE ---
       const player1Ref = doc(db, "leaderboard", validatedData.player1.name.toLowerCase());
+      const player2Ref = doc(db, "leaderboard", validatedData.player2.name.toLowerCase());
+      
       const player1Doc = await transaction.get(player1Ref);
+      const player2Doc = await transaction.get(player2Ref);
+
+      // --- WRITE PHASE ---
       if (!player1Doc.exists()) {
         transaction.set(player1Ref, { totalPoints: validatedData.player1.totalPoints, matchesPlayed: 1, id: validatedData.player1.name });
       } else {
@@ -99,8 +105,6 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
         transaction.update(player1Ref, { totalPoints: newPoints, matchesPlayed: newMatches });
       }
 
-      const player2Ref = doc(db, "leaderboard", validatedData.player2.name.toLowerCase());
-      const player2Doc = await transaction.get(player2Ref);
       if (!player2Doc.exists()) {
         transaction.set(player2Ref, { totalPoints: validatedData.player2.totalPoints, matchesPlayed: 1, id: validatedData.player2.name });
       } else {
