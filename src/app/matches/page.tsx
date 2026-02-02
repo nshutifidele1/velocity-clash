@@ -1,9 +1,11 @@
 import { db } from "@/lib/firebase";
-import type { MatchResult, UpcomingMatch } from "@/lib/types";
+import type { MatchResult, UpcomingMatch, UserProfile } from "@/lib/types";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { VersusMatchCard } from "@/components/versus-match-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Swords } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getInitials } from "@/lib/utils";
 
 async function getMatches(): Promise<MatchResult[]> {
   try {
@@ -40,10 +42,36 @@ async function getUpcomingMatches(): Promise<UpcomingMatch[]> {
         console.error("Error fetching upcoming matches: ", error);
         return [];
     }
-  }
+}
+
+async function getUsers(): Promise<UserProfile[]> {
+    try {
+      const usersCol = collection(db, "users");
+      const usersSnapshot = await getDocs(usersCol);
+      const usersList = usersSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+              gamingName: data.gamingName,
+              experience: data.experience,
+              gender: data.gender,
+              photoUrl: data.photoUrl,
+              email: data.email,
+          } as UserProfile;
+      });
+      return usersList.filter(u => u.gamingName);
+    } catch (error) {
+      console.error("Error fetching users: ", error);
+      return [];
+    }
+}
   
-const UpcomingMatchesSection = async () => {
-    const upcoming = await getUpcomingMatches();
+const UpcomingMatchesSection = async ({ upcoming, users }: { upcoming: UpcomingMatch[], users: UserProfile[] }) => {
+    const usersMap = new Map<string, UserProfile>();
+    users.forEach(user => {
+        if (user.gamingName) {
+            usersMap.set(user.gamingName, user);
+        }
+    });
 
     if (upcoming.length === 0) {
         return null;
@@ -61,17 +89,34 @@ const UpcomingMatchesSection = async () => {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    {upcoming.map((match) => (
-                        <div key={match.id} className="text-left p-4 rounded-lg bg-background/50 border flex justify-between items-center">
-                            <div>
-                                <p className="font-headline text-lg">
-                                    {match.player1Name} vs {match.player2Name}
-                                </p>
+                <div className="space-y-6">
+                    {upcoming.map((match) => {
+                        const player1 = usersMap.get(match.player1Name);
+                        const player2 = usersMap.get(match.player2Name);
+
+                        return (
+                             <div key={match.id} className="text-center p-6 rounded-xl bg-background/50 border-2 border-border/50 transition-all hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10">
+                                <div className="flex justify-around items-center">
+                                    <div className="flex flex-col items-center gap-2 w-1/3">
+                                        <Avatar className="h-16 w-16 border-2 border-muted">
+                                            <AvatarImage src={player1?.photoUrl} alt={player1?.gamingName} />
+                                            <AvatarFallback>{getInitials(match.player1Name)}</AvatarFallback>
+                                        </Avatar>
+                                        <p className="font-headline text-lg font-semibold truncate w-full">{match.player1Name}</p>
+                                    </div>
+                                    <Swords className="h-10 w-10 text-primary" />
+                                    <div className="flex flex-col items-center gap-2 w-1/3">
+                                        <Avatar className="h-16 w-16 border-2 border-muted">
+                                            <AvatarImage src={player2?.photoUrl} alt={player2?.gamingName} />
+                                            <AvatarFallback>{getInitials(match.player2Name)}</AvatarFallback>
+                                        </Avatar>
+                                        <p className="font-headline text-lg font-semibold truncate w-full">{match.player2Name}</p>
+                                    </div>
+                                </div>
+                                <p className="text-muted-foreground text-md font-mono mt-4">{new Date(match.time).toLocaleString([], { dateStyle: 'full', timeStyle: 'short' })}</p>
                             </div>
-                            <p className="text-muted-foreground text-sm font-mono">{new Date(match.time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</p>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </CardContent>
         </Card>
@@ -79,15 +124,19 @@ const UpcomingMatchesSection = async () => {
 }
 
 export default async function MatchesPage() {
-    const matches = await getMatches();
+    const [matches, upcoming, users] = await Promise.all([
+        getMatches(),
+        getUpcomingMatches(),
+        getUsers(),
+    ]);
 
     return (
         <main className="container mx-auto px-4 py-8">
              <h1 className="font-headline text-4xl mb-12 text-center">Matches</h1>
             
-             <UpcomingMatchesSection />
+             <UpcomingMatchesSection upcoming={upcoming} users={users} />
 
-             <div className="flex items-center gap-3 mb-6">
+             <div className="flex items-center gap-3 mb-6 mt-12">
                 <Swords className="h-7 w-7 text-accent"/>
                 <h2 className="font-headline text-3xl text-accent text-glow-accent">Recent Results</h2>
              </div>
