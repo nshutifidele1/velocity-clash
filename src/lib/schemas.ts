@@ -36,4 +36,7 @@ export const upcomingMatchSchema = z.object({
   player1Name: z.string().min(1, "Player 1 name is required."),
   player2Name: z.string().min(1, "Player 2 name is required."),
   time: z.date({ required_error: "Match time is required." }),
+}).refine(data => data.player1Name !== data.player2Name, {
+    message: "Players cannot be the same.",
+    path: ["player2Name"],
 });

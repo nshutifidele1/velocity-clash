@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import type { UpcomingMatch } from "@/lib/types";
+import type { UpcomingMatch, UserProfile } from "@/lib/types";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import {
   Table,
@@ -40,8 +40,31 @@ async function getUpcomingMatches(): Promise<UpcomingMatch[]> {
   }
 }
 
+async function getUsers(): Promise<UserProfile[]> {
+    try {
+      const usersCol = collection(db, "users");
+      const usersSnapshot = await getDocs(usersCol);
+      const usersList = usersSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+              gamingName: data.gamingName,
+              experience: data.experience,
+              gender: data.gender,
+              photoUrl: data.photoUrl,
+              email: data.email,
+          } as UserProfile;
+      });
+      return usersList.filter(u => u.gamingName);
+    } catch (error) {
+      console.error("Error fetching users: ", error);
+      return [];
+    }
+}
+
+
 export default async function UpcomingMatchesAdminPage() {
     const upcomingMatches = await getUpcomingMatches();
+    const players = await getUsers();
 
     return (
         <div className="space-y-8">
@@ -54,7 +77,7 @@ export default async function UpcomingMatchesAdminPage() {
                     <CardDescription>Add a new match to the upcoming schedule.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <UpcomingMatchForm />
+                    <UpcomingMatchForm players={players} />
                 </CardContent>
             </Card>
             <Card>

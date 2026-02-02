@@ -16,8 +16,14 @@ import { addUpcomingMatch } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { upcomingMatchSchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
+import type { UserProfile } from "@/lib/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
-export function UpcomingMatchForm() {
+interface UpcomingMatchFormProps {
+  players: UserProfile[];
+}
+
+export function UpcomingMatchForm({ players }: UpcomingMatchFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
@@ -58,9 +64,20 @@ export function UpcomingMatchForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Player 1</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter player name" {...field} />
-                </FormControl>
+                 <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <FormControl>
+                        <SelectTrigger>
+                        <SelectValue placeholder="Select a player" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        {players.map((player) => (
+                        <SelectItem key={player.email} value={player.gamingName}>
+                            {player.gamingName}
+                        </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -71,9 +88,20 @@ export function UpcomingMatchForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Player 2</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter player name" {...field} />
-                </FormControl>
+                <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <FormControl>
+                        <SelectTrigger>
+                        <SelectValue placeholder="Select a player" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        {players.map((player) => (
+                        <SelectItem key={player.email} value={player.gamingName}>
+                            {player.gamingName}
+                        </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
