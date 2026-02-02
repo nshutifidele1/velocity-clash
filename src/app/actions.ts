@@ -1,6 +1,4 @@
 "use server";
-import { config } from "dotenv";
-config();
 
 import { z } from "zod";
 import { assignPerformanceTitles } from "@/ai/flows/assign-performance-titles";
