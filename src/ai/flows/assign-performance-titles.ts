@@ -32,13 +32,17 @@ Player 1: {{player1Name}}
 Finishing Position: {{player1FinishingPosition}}
 Total Points: {{player1TotalPoints}}
 Power-Up Hits: {{player1PowerUpHits}}
-Lap Time: {{player1LapTime}} (if available) or Speed Rank: {{player1SpeedRank}} (if lap time is unavailable)
+{{#if player1LapTime}}
+Lap Time: {{player1LapTime}} seconds
+{{/if}}
 
 Player 2: {{player2Name}}
 Finishing Position: {{player2FinishingPosition}}
 Total Points: {{player2TotalPoints}}
 Power-Up Hits: {{player2PowerUpHits}}
-Lap Time: {{player2LapTime}} (if available) or Speed Rank: {{player2SpeedRank}} (if lap time is unavailable)
+{{#if player2LapTime}}
+Lap Time: {{player2LapTime}} seconds
+{{/if}}
 
 Consider the following titles when assigning them:
 
@@ -66,6 +70,9 @@ const assignPerformanceTitlesFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error("The AI failed to generate titles. Please try again.");
+    }
+    return output;
   }
 );

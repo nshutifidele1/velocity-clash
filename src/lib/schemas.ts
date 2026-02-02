@@ -5,8 +5,14 @@ const playerStatsSchema = z.object({
   finishingPosition: z.coerce.number().int().min(1, "Position must be 1 or greater."),
   totalPoints: z.coerce.number().int().min(0, "Points cannot be negative."),
   powerUpHits: z.coerce.number().int().min(0, "Hits cannot be negative."),
-  lapTime: z.string().optional(),
-  fansGained: z.string().optional(),
+  lapTime: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce.number({ invalid_type_error: "Lap time must be a number" }).optional()
+  ),
+  fansGained: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce.number({ invalid_type_error: "Fans gained must be a number" }).optional()
+  ),
 });
 
 export const formSchema = z.object({

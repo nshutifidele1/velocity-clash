@@ -12,11 +12,11 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
   try {
     const validatedData = formSchema.parse(values);
 
-    const p1LapTimeNum = validatedData.player1.lapTime ? Number(validatedData.player1.lapTime) : undefined;
-    const p2LapTimeNum = validatedData.player2.lapTime ? Number(validatedData.player2.lapTime) : undefined;
+    const p1LapTimeNum = validatedData.player1.lapTime;
+    const p2LapTimeNum = validatedData.player2.lapTime;
 
-    const p1FansGainedNum = validatedData.player1.fansGained ? Number(validatedData.player1.fansGained) : 0;
-    const p2FansGainedNum = validatedData.player2.fansGained ? Number(validatedData.player2.fansGained) : 0;
+    const p1FansGainedNum = validatedData.player1.fansGained || 0;
+    const p2FansGainedNum = validatedData.player2.fansGained || 0;
 
 
     const aiInput = {
@@ -106,6 +106,9 @@ export async function submitMatchResults(values: z.infer<typeof formSchema>, upc
     console.error("Error submitting match results:", error);
     if (error instanceof z.ZodError) {
         return { error: "Validation failed", details: error.flatten() };
+    }
+    if (error instanceof Error) {
+        return { error: error.message };
     }
     return { error: "An unexpected error occurred on the server." };
   }
